@@ -1,0 +1,20 @@
+{
+  "key": "technical_spec_document",
+  "title": "Technical Specification - Heat Exchanger Frame",
+  "source": "EMAIL",
+  "sender": "engineering@thermofab-industries.com",
+  "subject": "Technical Specification Package - Heat Exchanger Frame",
+  "body": "Sharing the specification package for the frame revision under evaluation. This is not a clean RFQ yet, but the team needs the document in the system.",
+  "expected_document_type": "TECHNICAL_SPEC",
+  "description": "Specification document with engineering-style terminology and partial extraction.",
+  "initial_comment": "Imported from demo intake scenario.",
+  "attachments": [
+    {
+      "filename": "heat_exchanger_frame_spec.md",
+      "content_type": "text/markdown",
+      "template_kind": "MARKDOWN",
+      "content": "# Technical Specification\n\nDocument Reference: HXF-620-REV2\nMaterial: Structural steel S275JR\nOperating Conditions: Outdoor installation, coastal atmosphere\nDelivery Deadline: 2026-06-01\n\nThis datasheet defines frame geometry, corrosion allowance, coating expectations and lifting constraints for the heat exchanger support frame."
+    }
+  ]
+}
+

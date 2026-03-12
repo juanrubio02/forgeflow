@@ -156,6 +156,29 @@ export interface AssignRequestPayload {
   assigned_membership_id: string;
 }
 
+export interface RequestListFilters {
+  q?: string;
+  status?: RequestStatus;
+  assigned_membership_id?: string;
+  source?: RequestSource;
+}
+
+export interface DemoIntakeScenario {
+  key: string;
+  title: string;
+  source: RequestSource;
+  sender: string;
+  expected_document_type: DocumentDetectedType;
+  attachments: number;
+  description: string;
+}
+
+export interface DemoIntakeRunResult {
+  request_id: string;
+  document_ids: string[];
+  scenario_key: string;
+}
+
 export interface CreateRequestCommentPayload {
   body: string;
 }

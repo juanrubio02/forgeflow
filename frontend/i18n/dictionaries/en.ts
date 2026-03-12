@@ -13,6 +13,7 @@ export const en = {
         dashboard: "Dashboard",
         requests: "Requests",
         newRequest: "New Request",
+        demoIntake: "Demo intake",
       },
       intelligence: {
         eyebrow: "Document Intelligence",
@@ -112,6 +113,37 @@ export const en = {
         "Create a new industrial intake and attach documents immediately.",
     },
   },
+  demoIntake: {
+    header: {
+      eyebrow: "Operational Simulator",
+      title: "Demo Intake Simulator",
+      description:
+        "Generate realistic incoming requests as if they arrived through email or RFQ channels and push the real document, timeline and extraction pipeline.",
+      badge: "Demo + QA",
+    },
+    list: {
+      loadError:
+        "Demo scenarios could not be loaded for the active workspace. Refresh the page and try again.",
+    },
+    card: {
+      eyebrow: "Scenario",
+      sender: "Sender",
+      flow: "Flow",
+      flowValue: "Request + documents + processing",
+      attachments: "{count} attachments",
+      intelligenceHint:
+        "This scenario reuses the real intake and document processing pipeline.",
+    },
+    run: {
+      cta: "Generate request",
+      pending: "Generating...",
+      successTitle: "Demo request generated",
+      successDescription:
+        "The real request for scenario {scenario} was created and its detail view will open.",
+      errorTitle: "Could not generate demo scenario",
+      fallbackError: "The demo scenario could not be executed.",
+    },
+  },
   requests: {
     header: {
       eyebrow: "Pipeline",
@@ -129,7 +161,6 @@ export const en = {
       records: "{count} active records",
       description:
         "Tenant-scoped intake and pipeline records already available in the backend.",
-      searchPlaceholder: "Search requests",
       columns: {
         title: "Title",
         status: "Status",
@@ -139,9 +170,23 @@ export const en = {
       },
       open: "Open",
       emptyTitle: "No requests in this workspace",
+      emptyFilteredTitle: "No results for the active filters",
       emptyDescription:
         "Requests will appear here as soon as the team starts registering industrial demand.",
+      emptyFilteredDescription:
+        "Try clearing the search or relaxing the filters to recover requests from the active workspace.",
       emptyAction: "Create request",
+    },
+    filters: {
+      searchLabel: "Search by title",
+      searchPlaceholder: "Search by title",
+      statusLabel: "Status",
+      sourceLabel: "Source",
+      assigneeLabel: "Assignee",
+      allStatuses: "All statuses",
+      allSources: "All sources",
+      allAssignees: "All assignees",
+      reset: "Reset filters",
     },
     new: {
       eyebrow: "Create",

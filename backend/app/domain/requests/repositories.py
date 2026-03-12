@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 from app.domain.requests.entities import Request
+from app.domain.requests.sources import RequestSource
 from app.domain.requests.statuses import RequestStatus
 
 
@@ -21,6 +22,18 @@ class RequestRepository(ABC):
 
     @abstractmethod
     async def list_by_organization_id(self, organization_id: UUID) -> list[Request]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def list_by_organization_filters(
+        self,
+        organization_id: UUID,
+        *,
+        q: str | None = None,
+        status: RequestStatus | None = None,
+        assigned_membership_id: UUID | None = None,
+        source: RequestSource | None = None,
+    ) -> list[Request]:
         raise NotImplementedError
 
     @abstractmethod

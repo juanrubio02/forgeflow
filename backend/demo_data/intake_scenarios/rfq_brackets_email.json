@@ -1,0 +1,20 @@
+{
+  "key": "rfq_brackets_email",
+  "title": "RFQ - Stainless Steel Mounting Brackets",
+  "source": "EMAIL",
+  "sender": "procurement@powergensystems.com",
+  "subject": "RFQ: Stainless Steel Mounting Brackets for Generator Skids",
+  "body": "Hello team, please quote the attached bracket package for our next generator skid batch. We need pricing, lead time and material confirmation by Friday.",
+  "expected_document_type": "QUOTE_REQUEST",
+  "description": "Standard incoming RFQ with metal part requirements and clear extraction signals.",
+  "initial_comment": "Imported from demo intake scenario.",
+  "attachments": [
+    {
+      "filename": "rfq_mounting_brackets.md",
+      "content_type": "text/markdown",
+      "template_kind": "MARKDOWN",
+      "content": "# Request for Quotation\n\nRFQ Number: RFQ-2026-118\nDocument Reference: BRK-118-A\nMaterial: Stainless Steel 304\nRequested Quantity: 240 units\nDelivery Deadline: 2026-04-18\n\nPlease quote laser cut and bent mounting brackets for generator skid assemblies. Include finish, tooling assumptions and packing method."
+    }
+  ]
+}
+

@@ -1,0 +1,20 @@
+{
+  "key": "ambiguous_document_review_case",
+  "title": "Ambiguous Incoming Document - Mixed Supply Notes",
+  "source": "EMAIL",
+  "sender": "ops.coordinator@mixedsupply.net",
+  "subject": "Mixed supply notes for upcoming fabrication batch",
+  "body": "The attached note is incomplete, but please log it so the team can review and decide whether it is actionable or needs manual clarification.",
+  "expected_document_type": "OTHER",
+  "description": "Partial and ambiguous incoming document intended to showcase human review after imperfect extraction.",
+  "initial_comment": "Imported from demo intake scenario.",
+  "attachments": [
+    {
+      "filename": "mixed_supply_notes.txt",
+      "content_type": "text/plain",
+      "template_kind": "TEXT",
+      "content": "Reference maybe: MIX-41\nPossible material: stainless?\nNeed around 8 or 10 units\nSchedule not fixed, maybe after May\nPlease review with commercial team before moving ahead."
+    }
+  ]
+}
+

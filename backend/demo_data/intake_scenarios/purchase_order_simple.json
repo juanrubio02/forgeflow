@@ -1,0 +1,20 @@
+{
+  "key": "purchase_order_simple",
+  "title": "Purchase Order - Pump Shaft Guards",
+  "source": "EMAIL",
+  "sender": "orders@coastlinepumps.com",
+  "subject": "PO 45892 - Pump Shaft Guards",
+  "body": "Please find attached our formal purchase order for shaft guards. Confirm shipment window and packaging details.",
+  "expected_document_type": "PURCHASE_ORDER",
+  "description": "Simple purchase order with clear PO number and delivery cues.",
+  "initial_comment": "Imported from demo intake scenario.",
+  "attachments": [
+    {
+      "filename": "po_45892.txt",
+      "content_type": "text/plain",
+      "template_kind": "TEXT",
+      "content": "PURCHASE ORDER\nPO Number: PO-45892\nDocument Reference: SG-45892\nMaterial: Powder coated steel\nRequested Quantity: 120 pcs\nDelivery Deadline: 2026-04-09\nShip To: Coastline Pumps - Warehouse 2\nItem: Pump shaft guards for model CP-48."
+    }
+  ]
+}
+

@@ -3,14 +3,33 @@ import type {
   AssignRequestPayload,
   CreateRequestCommentPayload,
   CreateRequestPayload,
+  RequestListFilters,
   RequestActivity,
   RequestComment,
   RequestRecord,
   TransitionRequestStatusPayload,
 } from "@/lib/api/types";
 
-export function listRequests(): Promise<RequestRecord[] | null> {
-  return apiRequest<RequestRecord[]>("/requests", {
+export function listRequests(filters: RequestListFilters = {}): Promise<RequestRecord[] | null> {
+  const searchParams = new URLSearchParams();
+  if (filters.q) {
+    searchParams.set("q", filters.q);
+  }
+  if (filters.status) {
+    searchParams.set("status", filters.status);
+  }
+  if (filters.assigned_membership_id) {
+    searchParams.set("assigned_membership_id", filters.assigned_membership_id);
+  }
+  if (filters.source) {
+    searchParams.set("source", filters.source);
+  }
+
+  const path = searchParams.toString()
+    ? `/requests?${searchParams.toString()}`
+    : "/requests";
+
+  return apiRequest<RequestRecord[]>(path, {
     includeAuth: true,
     includeMembership: true,
   });

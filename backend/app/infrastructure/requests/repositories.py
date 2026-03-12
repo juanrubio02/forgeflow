@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.requests.entities import Request
 from app.domain.requests.repositories import RequestRepository
+from app.domain.requests.sources import RequestSource
 from app.domain.requests.statuses import RequestStatus
 from app.infrastructure.database.models.request import RequestModel
 
@@ -41,11 +42,32 @@ class SqlAlchemyRequestRepository(RequestRepository):
         return self._to_domain(model)
 
     async def list_by_organization_id(self, organization_id: UUID) -> list[Request]:
+        return await self.list_by_organization_filters(organization_id)
+
+    async def list_by_organization_filters(
+        self,
+        organization_id: UUID,
+        *,
+        q: str | None = None,
+        status: RequestStatus | None = None,
+        assigned_membership_id: UUID | None = None,
+        source: RequestSource | None = None,
+    ) -> list[Request]:
         statement = (
             select(RequestModel)
             .where(RequestModel.organization_id == organization_id)
             .order_by(RequestModel.created_at.desc(), RequestModel.id.desc())
         )
+        if q:
+            statement = statement.where(RequestModel.title.ilike(f"%{q}%"))
+        if status is not None:
+            statement = statement.where(RequestModel.status == status)
+        if assigned_membership_id is not None:
+            statement = statement.where(
+                RequestModel.assigned_membership_id == assigned_membership_id
+            )
+        if source is not None:
+            statement = statement.where(RequestModel.source == source)
         result = await self._session.execute(statement)
         models = result.scalars().all()
         return [self._to_domain(model) for model in models]

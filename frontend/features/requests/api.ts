@@ -16,6 +16,7 @@ import type {
   AssignRequestPayload,
   CreateRequestCommentPayload,
   CreateRequestPayload,
+  RequestListFilters,
   TransitionRequestStatusPayload,
 } from "@/lib/api/types";
 
@@ -26,10 +27,10 @@ export const requestsKeys = {
   comments: (requestId: string) => ["request-comments", requestId] as const,
 };
 
-export function useRequestsQuery() {
+export function useRequestsQuery(filters: RequestListFilters = {}) {
   return useQuery({
-    queryKey: requestsKeys.all,
-    queryFn: async () => (await listRequests()) ?? [],
+    queryKey: [...requestsKeys.all, "list", filters],
+    queryFn: async () => (await listRequests(filters)) ?? [],
   });
 }
 

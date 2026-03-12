@@ -30,3 +30,12 @@ class AssignRequestCommand(BaseModel):
     organization_id: UUID
     membership_id: UUID
     assigned_membership_id: UUID
+
+
+class ListRequestsFilters(BaseModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+
+    q: str | None = Field(default=None, max_length=255)
+    status: RequestStatus | None = None
+    assigned_membership_id: UUID | None = None
+    source: RequestSource | None = None

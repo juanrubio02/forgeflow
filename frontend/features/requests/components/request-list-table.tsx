@@ -1,20 +1,15 @@
-"use client";
-
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -28,8 +23,13 @@ import { interpolate, useI18n } from "@/i18n/hooks";
 import type { RequestRecord } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/utils";
 
-export function RequestListTable({ requests }: { requests: RequestRecord[] }) {
-  const [globalFilter, setGlobalFilter] = useState("");
+export function RequestListTable({
+  requests,
+  hasActiveFilters = false,
+}: {
+  requests: RequestRecord[];
+  hasActiveFilters?: boolean;
+}) {
   const { locale, messages } = useI18n();
 
   const columns = useMemo<ColumnDef<RequestRecord>[]>(
@@ -90,26 +90,22 @@ export function RequestListTable({ requests }: { requests: RequestRecord[] }) {
   const table = useReactTable({
     data: requests,
     columns,
-    state: {
-      globalFilter,
-    },
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    globalFilterFn: (row, _columnId, filterValue) => {
-      const query = String(filterValue).toLowerCase();
-      return (
-        row.original.title.toLowerCase().includes(query) ||
-        row.original.status.toLowerCase().includes(query)
-      );
-    },
   });
 
   if (!requests.length) {
     return (
       <EmptyState
-        title={messages.requests.list.emptyTitle}
-        description={messages.requests.list.emptyDescription}
+        title={
+          hasActiveFilters
+            ? messages.requests.list.emptyFilteredTitle
+            : messages.requests.list.emptyTitle
+        }
+        description={
+          hasActiveFilters
+            ? messages.requests.list.emptyFilteredDescription
+            : messages.requests.list.emptyDescription
+        }
         action={{ label: messages.requests.list.emptyAction, href: "/requests/new" }}
       />
     );
@@ -131,15 +127,6 @@ export function RequestListTable({ requests }: { requests: RequestRecord[] }) {
           <p className="mt-2 text-sm text-slate-600">
             {messages.requests.list.description}
           </p>
-        </div>
-        <div className="relative w-full max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input
-            value={globalFilter}
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            placeholder={messages.requests.list.searchPlaceholder}
-            className="pl-10"
-          />
         </div>
       </CardHeader>
       <CardContent>

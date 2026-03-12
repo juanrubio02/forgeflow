@@ -1,0 +1,20 @@
+{
+  "key": "rfq_scanned_document",
+  "title": "Scanned RFQ - Motor Base Plates",
+  "source": "EMAIL",
+  "sender": "buying.team@rotorworks.eu",
+  "subject": "Scanned RFQ: Carbon Steel Motor Base Plates",
+  "body": "Forwarding a scanned RFQ received from our buyer. Please review and confirm whether the OCR output is good enough for quotation prep.",
+  "expected_document_type": "QUOTE_REQUEST",
+  "description": "Scenario oriented to OCR fallback using a scanned-style PDF generated at runtime.",
+  "initial_comment": "Imported from demo intake scenario.",
+  "attachments": [
+    {
+      "filename": "scanned_motor_base_plates.pdf",
+      "content_type": "application/pdf",
+      "template_kind": "SCANNED_PDF",
+      "content": "REQUEST FOR QUOTATION\nRFQ Number: RFQ-2026-227\nDocument Reference: MBP-227-SCAN\nMaterial: Carbon Steel S355\nRequested Quantity: 36 assemblies\nDelivery Deadline: 2026-05-02\nPlease quote welded motor base plates with primer coating and export packing."
+    }
+  ]
+}
+

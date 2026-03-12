@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Blocks, CirclePlus, FileStack, LayoutDashboard } from "lucide-react";
+import { Blocks, CirclePlus, FileStack, LayoutDashboard, WandSparkles } from "lucide-react";
 
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ export function Sidebar() {
     { href: "/dashboard", label: messages.shell.sidebar.navigation.dashboard, icon: LayoutDashboard },
     { href: "/requests", label: messages.shell.sidebar.navigation.requests, icon: FileStack },
     { href: "/requests/new", label: messages.shell.sidebar.navigation.newRequest, icon: CirclePlus },
+    { href: "/demo-intake", label: messages.shell.sidebar.navigation.demoIntake, icon: WandSparkles },
   ];
 
   return (

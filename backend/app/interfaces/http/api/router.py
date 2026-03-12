@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.interfaces.http.api.routes.auth import router as auth_router
 from app.interfaces.http.api.routes.documents import router as documents_router
+from app.interfaces.http.api.routes.demo_intake import router as demo_intake_router
 from app.interfaces.http.api.routes.health import router as health_router
 from app.interfaces.http.api.routes.organization_memberships import (
     router as organization_memberships_router,
@@ -18,3 +19,4 @@ api_router.include_router(users_router)
 api_router.include_router(organization_memberships_router)
 api_router.include_router(requests_router)
 api_router.include_router(documents_router)
+api_router.include_router(demo_intake_router)

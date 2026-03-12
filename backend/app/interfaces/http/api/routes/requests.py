@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.auth.authorization import MembershipPermission
@@ -10,7 +10,10 @@ from app.application.request_comments.commands import CreateRequestCommentComman
 from app.application.request_comments.schemas import RequestCommentReadModel
 from app.application.requests.commands import AssignRequestCommand
 from app.application.requests.commands import CreateRequestCommand
+from app.application.requests.commands import ListRequestsFilters
 from app.application.requests.commands import TransitionRequestStatusCommand
+from app.domain.requests.sources import RequestSource
+from app.domain.requests.statuses import RequestStatus
 from app.application.requests.schemas import RequestReadModel
 from app.application.requests.services import (
     AssignRequestUseCase,
@@ -74,6 +77,10 @@ async def create_request(
 
 @router.get("", response_model=list[RequestReadModel])
 async def list_requests(
+    q: str | None = Query(default=None, max_length=255),
+    status: RequestStatus | None = Query(default=None),
+    assigned_membership_id: UUID | None = Query(default=None),
+    source: RequestSource | None = Query(default=None),
     session: AsyncSession = Depends(get_db_session),
     current_membership: AuthenticatedMembershipReadModel = Depends(
         get_current_membership
@@ -81,7 +88,13 @@ async def list_requests(
 ) -> list[RequestReadModel]:
     repository = SqlAlchemyRequestRepository(session=session)
     use_case = ListRequestsUseCase(request_repository=repository)
-    return await use_case.execute(current_membership.organization_id)
+    filters = ListRequestsFilters(
+        q=q,
+        status=status,
+        assigned_membership_id=assigned_membership_id,
+        source=source,
+    )
+    return await use_case.execute(current_membership.organization_id, filters)
 
 
 @router.get("/{request_id}", response_model=RequestReadModel)

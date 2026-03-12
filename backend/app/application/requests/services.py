@@ -8,6 +8,7 @@ from app.application.organization_memberships.exceptions import (
 from app.application.organizations.exceptions import OrganizationNotFoundError
 from app.application.requests.commands import CreateRequestCommand
 from app.application.requests.commands import AssignRequestCommand
+from app.application.requests.commands import ListRequestsFilters
 from app.application.requests.commands import TransitionRequestStatusCommand
 from app.application.requests.exceptions import (
     InvalidRequestStatusTransitionError,
@@ -111,8 +112,18 @@ class ListRequestsUseCase:
     def __init__(self, request_repository: RequestRepository) -> None:
         self._request_repository = request_repository
 
-    async def execute(self, organization_id: UUID) -> list[RequestReadModel]:
-        requests = await self._request_repository.list_by_organization_id(organization_id)
+    async def execute(
+        self,
+        organization_id: UUID,
+        filters: ListRequestsFilters,
+    ) -> list[RequestReadModel]:
+        requests = await self._request_repository.list_by_organization_filters(
+            organization_id,
+            q=filters.q,
+            status=filters.status,
+            assigned_membership_id=filters.assigned_membership_id,
+            source=filters.source,
+        )
         return [
             RequestReadModel.model_validate(request, from_attributes=True)
             for request in requests

@@ -13,6 +13,7 @@ export const es = {
         dashboard: "Resumen",
         requests: "Solicitudes",
         newRequest: "Nueva solicitud",
+        demoIntake: "Intake demo",
       },
       intelligence: {
         eyebrow: "Inteligencia documental",
@@ -112,6 +113,37 @@ export const es = {
         "Crea una nueva entrada industrial y adjunta documentos inmediatamente.",
     },
   },
+  demoIntake: {
+    header: {
+      eyebrow: "Simulador operativo",
+      title: "Simulador de intake demo",
+      description:
+        "Genera solicitudes entrantes realistas como si llegaran por email o RFQ y empuja el pipeline real de documentos, timeline y extracción.",
+      badge: "Demo + QA",
+    },
+    list: {
+      loadError:
+        "No se pudieron cargar los escenarios demo del workspace activo. Recarga la página e inténtalo de nuevo.",
+    },
+    card: {
+      eyebrow: "Escenario",
+      sender: "Remitente",
+      flow: "Flujo",
+      flowValue: "Request + documentos + procesamiento",
+      attachments: "{count} adjuntos",
+      intelligenceHint:
+        "Este escenario reutiliza el pipeline real de intake y procesamiento documental.",
+    },
+    run: {
+      cta: "Generar solicitud",
+      pending: "Generando...",
+      successTitle: "Solicitud demo generada",
+      successDescription:
+        "Se ha creado la request real del escenario {scenario} y se abrirá su detalle.",
+      errorTitle: "No se pudo generar el escenario demo",
+      fallbackError: "No se pudo ejecutar el escenario demo.",
+    },
+  },
   requests: {
     header: {
       eyebrow: "Pipeline",
@@ -129,7 +161,6 @@ export const es = {
       records: "{count} registros activos",
       description:
         "Registros de intake y pipeline aislados por tenant ya disponibles en el backend.",
-      searchPlaceholder: "Buscar solicitudes",
       columns: {
         title: "Título",
         status: "Estado",
@@ -139,9 +170,23 @@ export const es = {
       },
       open: "Abrir",
       emptyTitle: "No hay solicitudes en este workspace",
+      emptyFilteredTitle: "No hay resultados para los filtros aplicados",
       emptyDescription:
         "Las solicitudes aparecerán aquí en cuanto el equipo empiece a registrar demanda industrial.",
+      emptyFilteredDescription:
+        "Prueba a limpiar la búsqueda o relajar los filtros para recuperar solicitudes del workspace activo.",
       emptyAction: "Crear solicitud",
+    },
+    filters: {
+      searchLabel: "Buscar por título",
+      searchPlaceholder: "Buscar por título",
+      statusLabel: "Estado",
+      sourceLabel: "Origen",
+      assigneeLabel: "Responsable",
+      allStatuses: "Todos los estados",
+      allSources: "Todos los orígenes",
+      allAssignees: "Todos los responsables",
+      reset: "Limpiar filtros",
     },
     new: {
       eyebrow: "Crear",

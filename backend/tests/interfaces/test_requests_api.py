@@ -149,6 +149,115 @@ async def test_get_requests_returns_only_active_tenant_requests(api_client: Asyn
 
 
 @pytest.mark.anyio
+async def test_get_requests_supports_title_search(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Search Requests", "search-requests")
+    user = await _create_user(api_client, "search-requests@example.com", "Search Requests")
+    membership = await _create_membership(api_client, organization["id"], user["id"])
+    auth_payload = await _login(api_client, "search-requests@example.com")
+
+    await _create_request(api_client, membership["id"], auth_payload["access_token"], title="Need industrial valves")
+    matching_request = await _create_request(
+        api_client,
+        membership["id"],
+        auth_payload["access_token"],
+        title="Need stainless pumps",
+    )
+
+    response = await api_client.get(
+        "/requests?q=stainless",
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload) == 1
+    assert payload[0]["id"] == matching_request["id"]
+
+
+@pytest.mark.anyio
+async def test_get_requests_supports_status_filter(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Status Filter Org", "status-filter-org")
+    user = await _create_user(api_client, "status-filter@example.com", "Status Filter")
+    membership = await _create_membership(api_client, organization["id"], user["id"], role="OWNER")
+    auth_payload = await _login(api_client, "status-filter@example.com")
+
+    target_request = await _create_request(
+        api_client,
+        membership["id"],
+        auth_payload["access_token"],
+        title="Status filter request",
+    )
+    transition_response = await api_client.post(
+        f"/requests/{target_request['id']}/status-transitions",
+        json={"new_status": RequestStatus.UNDER_REVIEW.value},
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+    assert transition_response.status_code == 200
+
+    response = await api_client.get(
+        f"/requests?status={RequestStatus.UNDER_REVIEW.value}",
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()] == [target_request["id"]]
+
+
+@pytest.mark.anyio
+async def test_get_requests_supports_assigned_membership_filter(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Assignee Filter Org", "assignee-filter-org")
+    owner = await _create_user(api_client, "assignee-owner@example.com", "Assignee Owner")
+    assignee = await _create_user(api_client, "assignee-user@example.com", "Assignee User")
+    owner_membership = await _create_membership(api_client, organization["id"], owner["id"], role="OWNER")
+    assignee_membership = await _create_membership(api_client, organization["id"], assignee["id"], role="MEMBER")
+    auth_payload = await _login(api_client, "assignee-owner@example.com")
+    request_payload = await _create_request(api_client, owner_membership["id"], auth_payload["access_token"])
+
+    assign_response = await api_client.patch(
+        f"/requests/{request_payload['id']}/assign",
+        json={"assigned_membership_id": assignee_membership["id"]},
+        headers=_membership_headers(auth_payload["access_token"], owner_membership["id"]),
+    )
+    assert assign_response.status_code == 200
+
+    response = await api_client.get(
+        f"/requests?assigned_membership_id={assignee_membership['id']}",
+        headers=_membership_headers(auth_payload["access_token"], owner_membership["id"]),
+    )
+
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()] == [request_payload["id"]]
+
+
+@pytest.mark.anyio
+async def test_get_requests_supports_source_filter(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Source Filter Org", "source-filter-org")
+    user = await _create_user(api_client, "source-filter@example.com", "Source Filter")
+    membership = await _create_membership(api_client, organization["id"], user["id"])
+    auth_payload = await _login(api_client, "source-filter@example.com")
+
+    await _create_request(api_client, membership["id"], auth_payload["access_token"], title="Email request")
+    response_manual = await api_client.post(
+        "/requests",
+        json={
+            "title": "Manual request",
+            "description": "Created manually",
+            "source": RequestSource.MANUAL.value,
+        },
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+    assert response_manual.status_code == 201
+
+    response = await api_client.get(
+        f"/requests?source={RequestSource.MANUAL.value}",
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+
+    assert response.status_code == 200
+    assert [item["source"] for item in response.json()] == [RequestSource.MANUAL.value]
+
+
+@pytest.mark.anyio
 async def test_post_requests_creates_request(api_client: AsyncClient) -> None:
     organization = await _create_organization(api_client, "Acme Requests", "acme-requests")
     user = await _create_user(api_client, "requester@example.com", "Requester Example")
