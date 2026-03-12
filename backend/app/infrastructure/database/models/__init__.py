@@ -8,6 +8,7 @@ from app.infrastructure.database.models.organization_membership import (
 )
 from app.infrastructure.database.models.request import RequestModel
 from app.infrastructure.database.models.request_activity import RequestActivityModel
+from app.infrastructure.database.models.request_comment import RequestCommentModel
 from app.infrastructure.database.models.user import UserModel
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "OrganizationMembershipModel",
     "RequestModel",
     "RequestActivityModel",
+    "RequestCommentModel",
 ]

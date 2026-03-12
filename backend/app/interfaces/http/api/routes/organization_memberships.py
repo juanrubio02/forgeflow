@@ -4,17 +4,23 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.organization_memberships.commands import CreateOrganizationMembershipCommand
-from app.application.organization_memberships.schemas import OrganizationMembershipReadModel
+from app.application.organization_memberships.schemas import (
+    OrganizationMembershipOptionReadModel,
+    OrganizationMembershipReadModel,
+)
 from app.application.organization_memberships.services import (
     CreateOrganizationMembershipUseCase,
     GetOrganizationMembershipUseCase,
+    ListOrganizationMembershipsUseCase,
 )
+from app.application.auth.schemas import AuthenticatedMembershipReadModel
 from app.infrastructure.database.session import get_db_session
 from app.infrastructure.organization_memberships.repositories import (
     SqlAlchemyOrganizationMembershipRepository,
 )
 from app.infrastructure.organizations.repositories import SqlAlchemyOrganizationRepository
 from app.infrastructure.users.repositories import SqlAlchemyUserRepository
+from app.interfaces.http.dependencies import get_current_membership
 from app.interfaces.http.schemas.organization_memberships import (
     CreateOrganizationMembershipRequest,
 )
@@ -59,3 +65,20 @@ async def get_organization_membership(
         membership_id=membership_id,
     )
 
+
+@router.get("", response_model=list[OrganizationMembershipOptionReadModel])
+async def list_organization_memberships(
+    organization_id: UUID,
+    session: AsyncSession = Depends(get_db_session),
+    current_membership: AuthenticatedMembershipReadModel = Depends(get_current_membership),
+) -> list[OrganizationMembershipOptionReadModel]:
+    if current_membership.organization_id != organization_id:
+        return []
+
+    membership_repository = SqlAlchemyOrganizationMembershipRepository(session=session)
+    user_repository = SqlAlchemyUserRepository(session=session)
+    use_case = ListOrganizationMembershipsUseCase(
+        organization_membership_repository=membership_repository,
+        user_repository=user_repository,
+    )
+    return await use_case.execute(organization_id=organization_id)

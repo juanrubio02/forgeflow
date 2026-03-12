@@ -4,6 +4,7 @@ import type {
   AuthenticatedUser,
   LoginPayload,
   MembershipOption,
+  OrganizationMembershipOption,
 } from "@/lib/api/types";
 
 export function login(payload: LoginPayload): Promise<AccessTokenResponse | null> {
@@ -23,4 +24,16 @@ export function getMembershipOptions(): Promise<MembershipOption[] | null> {
   return apiRequest<MembershipOption[]>("/auth/memberships", {
     includeAuth: true,
   });
+}
+
+export function getOrganizationMembershipOptions(
+  organizationId: string,
+): Promise<OrganizationMembershipOption[] | null> {
+  return apiRequest<OrganizationMembershipOption[]>(
+    `/organizations/${organizationId}/memberships`,
+    {
+      includeAuth: true,
+      includeMembership: true,
+    },
+  );
 }

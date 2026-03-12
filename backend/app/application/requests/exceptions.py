@@ -15,3 +15,7 @@ class RequestOrganizationMismatchError(ResourceConflictError):
 
 class InvalidRequestStatusTransitionError(ResourceConflictError):
     """Raised when a request status transition is not allowed."""
+
+
+class RequestAssignedMembershipOrganizationMismatchError(ResourceConflictError):
+    """Raised when an assigned membership does not belong to the request organization."""

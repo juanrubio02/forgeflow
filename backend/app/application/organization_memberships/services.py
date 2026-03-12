@@ -6,7 +6,10 @@ from app.application.organization_memberships.exceptions import (
     OrganizationMembershipAlreadyExistsError,
     OrganizationMembershipNotFoundError,
 )
-from app.application.organization_memberships.schemas import OrganizationMembershipReadModel
+from app.application.organization_memberships.schemas import (
+    OrganizationMembershipOptionReadModel,
+    OrganizationMembershipReadModel,
+)
 from app.application.organizations.exceptions import OrganizationNotFoundError
 from app.application.users.exceptions import UserNotFoundError
 from app.domain.organization_memberships.entities import OrganizationMembership
@@ -88,3 +91,41 @@ class GetOrganizationMembershipUseCase:
             )
 
         return OrganizationMembershipReadModel.model_validate(membership, from_attributes=True)
+
+
+class ListOrganizationMembershipsUseCase:
+    def __init__(
+        self,
+        organization_membership_repository: OrganizationMembershipRepository,
+        user_repository: UserRepository,
+    ) -> None:
+        self._organization_membership_repository = organization_membership_repository
+        self._user_repository = user_repository
+
+    async def execute(
+        self,
+        organization_id: UUID,
+    ) -> list[OrganizationMembershipOptionReadModel]:
+        memberships = await self._organization_membership_repository.list_active_by_organization_id(
+            organization_id
+        )
+        items: list[OrganizationMembershipOptionReadModel] = []
+        for membership in memberships:
+            user = await self._user_repository.get_by_id(membership.user_id)
+            if user is None:
+                continue
+
+            items.append(
+                OrganizationMembershipOptionReadModel(
+                    id=membership.id,
+                    organization_id=membership.organization_id,
+                    user_id=membership.user_id,
+                    user_full_name=user.full_name,
+                    user_email=user.email,
+                    role=membership.role,
+                    is_active=membership.is_active,
+                    created_at=membership.created_at,
+                    updated_at=membership.updated_at,
+                )
+            )
+        return items

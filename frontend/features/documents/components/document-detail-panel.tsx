@@ -82,10 +82,33 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
   const { locale, messages } = useI18n();
   const documentQuery = useDocumentQuery(documentId);
   const resultQuery = useDocumentProcessingResultQuery(documentId);
-  const requestId = documentQuery.data?.request_id ?? "";
+  const document = documentQuery.data ?? null;
+  const processingResult = resultQuery.data ?? null;
+  const requestId = document?.request_id ?? "";
   const enqueueMutation = useEnqueueDocumentProcessingMutation(documentId, requestId);
   const updateVerifiedDataMutation = useUpdateVerifiedDocumentDataMutation(documentId, requestId);
   const canProcess = activeMembership?.role === "OWNER" || activeMembership?.role === "ADMIN";
+  const signals = extractionSignals(
+    (processingResult?.structured_data as Record<string, unknown> | null | undefined) ?? null,
+  );
+  const hasVerifiedData =
+    Boolean(document?.verified_structured_data) &&
+    Object.keys(document?.verified_structured_data ?? {}).length > 0;
+  const initialVerifiedData = useMemo(
+    () =>
+      buildVerifiedDataFormState(
+        (document?.verified_structured_data as Record<string, unknown> | null | undefined) ?? null,
+        (signals.extractedFields as Record<string, unknown> | null | undefined) ?? null,
+      ),
+    [document?.verified_structured_data, signals.extractedFields],
+  );
+  const [verifiedDataForm, setVerifiedDataForm] = useState<VerifiedDataFormState>(
+    initialVerifiedData,
+  );
+
+  useEffect(() => {
+    setVerifiedDataForm(initialVerifiedData);
+  }, [initialVerifiedData]);
 
   if (documentQuery.isLoading) {
     return (
@@ -119,29 +142,7 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
     );
   }
 
-  const document = documentQuery.data;
-  const processingResult = resultQuery.data;
-  const signals = extractionSignals(
-    (processingResult?.structured_data as Record<string, unknown> | null | undefined) ?? null,
-  );
-  const hasVerifiedData =
-    Boolean(document.verified_structured_data) &&
-    Object.keys(document.verified_structured_data ?? {}).length > 0;
-  const initialVerifiedData = useMemo(
-    () =>
-      buildVerifiedDataFormState(
-        (document.verified_structured_data as Record<string, unknown> | null | undefined) ?? null,
-        (signals.extractedFields as Record<string, unknown> | null | undefined) ?? null,
-      ),
-    [document.verified_structured_data, signals.extractedFields],
-  );
-  const [verifiedDataForm, setVerifiedDataForm] = useState<VerifiedDataFormState>(
-    initialVerifiedData,
-  );
-
-  useEffect(() => {
-    setVerifiedDataForm(initialVerifiedData);
-  }, [initialVerifiedData]);
+  const documentRecord = documentQuery.data;
 
   return (
     <div className="page-stack">
@@ -152,32 +153,32 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
               {messages.documents.detail.eyebrow}
             </p>
             <CardTitle className="mt-2 text-3xl tracking-[-0.03em]">
-              {document.original_filename}
+              {documentRecord.original_filename}
             </CardTitle>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
               {messages.documents.detail.description}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Badge variant="neutral" size="sm">
-                {document.content_type}
+                {documentRecord.content_type}
               </Badge>
               <Badge variant="neutral" size="sm">
-                {formatRelativeFileSize(document.size_bytes, locale)}
+                {formatRelativeFileSize(documentRecord.size_bytes, locale)}
               </Badge>
               <Badge variant="info" size="sm">
-                {messages.documents.detail.updated} · {formatDateTime(document.updated_at, locale)}
+                {messages.documents.detail.updated} · {formatDateTime(documentRecord.updated_at, locale)}
               </Badge>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <DocumentProcessingStatusBadge status={document.processing_status} />
+            <DocumentProcessingStatusBadge status={documentRecord.processing_status} />
             <Button
               type="button"
               disabled={
                 !canProcess ||
                 enqueueMutation.isPending ||
                 !requestId ||
-                document.processing_status !== "PENDING"
+                documentRecord.processing_status !== "PENDING"
               }
               onClick={async () => {
                 try {
@@ -200,7 +201,7 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
               }}
             >
               <Cpu className="h-4 w-4" />
-              {document.processing_status === "PENDING"
+              {documentRecord.processing_status === "PENDING"
                 ? messages.documents.detail.launchProcessing
                 : messages.documents.detail.processingStarted}
             </Button>
@@ -222,7 +223,7 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
                 {messages.documents.detail.storageKey}
               </p>
               <p className="mt-2 break-all font-[family-name:var(--font-mono)] text-[0.82rem]">
-                {document.storage_key}
+                {documentRecord.storage_key}
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
@@ -230,14 +231,14 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   {messages.documents.detail.contentType}
                 </p>
-                <p className="mt-2 font-semibold">{document.content_type}</p>
+                <p className="mt-2 font-semibold">{documentRecord.content_type}</p>
               </div>
               <div className="surface-muted rounded-[var(--radius-control)] px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   {messages.documents.detail.size}
                 </p>
                 <p className="mt-2 font-semibold">
-                  {formatRelativeFileSize(document.size_bytes, locale)}
+                  {formatRelativeFileSize(documentRecord.size_bytes, locale)}
                 </p>
               </div>
             </div>
@@ -246,13 +247,13 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   {messages.documents.detail.created}
                 </p>
-                <p className="mt-2 font-semibold">{formatDateTime(document.created_at, locale)}</p>
+                <p className="mt-2 font-semibold">{formatDateTime(documentRecord.created_at, locale)}</p>
               </div>
               <div className="surface-muted rounded-[var(--radius-control)] px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   {messages.documents.detail.updated}
                 </p>
-                <p className="mt-2 font-semibold">{formatDateTime(document.updated_at, locale)}</p>
+                <p className="mt-2 font-semibold">{formatDateTime(documentRecord.updated_at, locale)}</p>
               </div>
             </div>
           </CardContent>

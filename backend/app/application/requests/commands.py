@@ -22,3 +22,11 @@ class TransitionRequestStatusCommand(BaseModel):
     organization_id: UUID
     membership_id: UUID
     new_status: RequestStatus
+
+
+class AssignRequestCommand(BaseModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+
+    organization_id: UUID
+    membership_id: UUID
+    assigned_membership_id: UUID

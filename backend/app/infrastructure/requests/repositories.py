@@ -23,6 +23,7 @@ class SqlAlchemyRequestRepository(RequestRepository):
             status=request.status,
             source=request.source,
             created_by_membership_id=request.created_by_membership_id,
+            assigned_membership_id=request.assigned_membership_id,
             created_at=request.created_at,
             updated_at=request.updated_at,
         )
@@ -63,6 +64,20 @@ class SqlAlchemyRequestRepository(RequestRepository):
         model.updated_at = updated_at
         return self._to_domain(model)
 
+    async def update_assignment(
+        self,
+        request_id: UUID,
+        assigned_membership_id: UUID | None,
+        updated_at: datetime,
+    ) -> Request:
+        model = await self._session.get(RequestModel, request_id)
+        if model is None:
+            raise ValueError(f"Request '{request_id}' was not found.")
+
+        model.assigned_membership_id = assigned_membership_id
+        model.updated_at = updated_at
+        return self._to_domain(model)
+
     @staticmethod
     def _to_domain(model: RequestModel) -> Request:
         return Request(
@@ -73,6 +88,7 @@ class SqlAlchemyRequestRepository(RequestRepository):
             status=model.status,
             source=model.source,
             created_by_membership_id=model.created_by_membership_id,
+            assigned_membership_id=model.assigned_membership_id,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )

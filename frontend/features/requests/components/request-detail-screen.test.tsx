@@ -15,6 +15,7 @@ vi.mock("@/features/requests/api", () => ({
       status: "UNDER_REVIEW",
       source: "EMAIL",
       created_by_membership_id: "mem-1",
+      assigned_membership_id: "mem-1",
       created_at: "2026-03-12T09:00:00Z",
       updated_at: "2026-03-12T10:00:00Z",
     },
@@ -32,7 +33,54 @@ vi.mock("@/features/requests/api", () => ({
       },
     ],
   }),
+  useRequestCommentsQuery: () => ({
+    data: [
+      {
+        id: "comment-1",
+        request_id: "req-1",
+        organization_id: "org-1",
+        membership_id: "mem-1",
+        body: "Need to align with supplier timeline.",
+        created_at: "2026-03-12T09:30:00Z",
+        updated_at: "2026-03-12T09:30:00Z",
+      },
+    ],
+  }),
+  useCreateRequestCommentMutation: () => ({
+    isPending: false,
+    mutateAsync: vi.fn(),
+  }),
+  useAssignRequestMutation: () => ({
+    isPending: false,
+    mutateAsync: vi.fn(),
+  }),
 }));
+
+vi.mock("@tanstack/react-query", async () => {
+  const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
+    "@tanstack/react-query",
+  );
+  return {
+    ...actual,
+    useQuery: () => ({
+      data: [
+        {
+          id: "mem-1",
+          organization_id: "org-1",
+          user_id: "user-1",
+          user_full_name: "Alice Admin",
+          user_email: "alice@example.com",
+          role: "ADMIN",
+          is_active: true,
+          created_at: "2026-03-12T09:00:00Z",
+          updated_at: "2026-03-12T09:00:00Z",
+        },
+      ],
+      isLoading: false,
+      isError: false,
+    }),
+  };
+});
 
 vi.mock("@/features/documents/api", () => ({
   useRequestDocumentsQuery: () => ({
@@ -64,6 +112,15 @@ vi.mock("@/hooks/use-toast", () => ({
   }),
 }));
 
+vi.mock("@/hooks/use-membership", () => ({
+  useMembership: () => ({
+    activeMembership: {
+      id: "mem-1",
+      role: "ADMIN",
+    },
+  }),
+}));
+
 vi.mock("@/features/requests/components/request-status-actions", () => ({
   RequestStatusActions: () => <div>Status actions</div>,
 }));
@@ -76,5 +133,7 @@ describe("RequestDetailScreen", () => {
     expect(screen.getByText("Status actions")).toBeInTheDocument();
     expect(screen.getByText("spec.pdf")).toBeInTheDocument();
     expect(screen.getByText("Solicitud creada")).toBeInTheDocument();
+    expect(screen.getByText("Need to align with supplier timeline.")).toBeInTheDocument();
+    expect(screen.getByText("Alice Admin · ADMIN", { selector: "p" })).toBeInTheDocument();
   });
 });

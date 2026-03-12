@@ -35,3 +35,10 @@ class OrganizationMembershipRepository(ABC):
         user_id: UUID,
     ) -> list[OrganizationMembership]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def list_active_by_organization_id(
+        self,
+        organization_id: UUID,
+    ) -> list[OrganizationMembership]:
+        raise NotImplementedError

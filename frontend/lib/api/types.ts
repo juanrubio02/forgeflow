@@ -48,6 +48,18 @@ export interface MembershipOption {
   updated_at: string;
 }
 
+export interface OrganizationMembershipOption {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  user_full_name: string;
+  user_email: string;
+  role: MembershipRole;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface RequestRecord {
   id: string;
   organization_id: string;
@@ -56,6 +68,7 @@ export interface RequestRecord {
   status: RequestStatus;
   source: RequestSource;
   created_by_membership_id: string;
+  assigned_membership_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -67,6 +80,8 @@ export interface RequestActivity {
   membership_id: string;
   type:
     | "REQUEST_CREATED"
+    | "REQUEST_ASSIGNED"
+    | "REQUEST_COMMENT_ADDED"
     | "STATUS_CHANGED"
     | "COMMENT_ADDED"
     | "DOCUMENT_UPLOADED"
@@ -74,6 +89,16 @@ export interface RequestActivity {
     | "NOTE_ADDED";
   payload: Record<string, unknown>;
   created_at: string;
+}
+
+export interface RequestComment {
+  id: string;
+  request_id: string;
+  organization_id: string;
+  membership_id: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DocumentRecord {
@@ -125,6 +150,14 @@ export interface CreateRequestPayload {
 
 export interface TransitionRequestStatusPayload {
   new_status: RequestStatus;
+}
+
+export interface AssignRequestPayload {
+  assigned_membership_id: string;
+}
+
+export interface CreateRequestCommentPayload {
+  body: string;
 }
 
 export interface CreateDocumentPayload {

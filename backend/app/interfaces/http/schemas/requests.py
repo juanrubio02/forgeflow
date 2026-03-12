@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.domain.requests.sources import RequestSource
@@ -16,3 +18,9 @@ class TransitionRequestStatusRequest(BaseModel):
     model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     new_status: RequestStatus
+
+
+class AssignRequestRequest(BaseModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+
+    assigned_membership_id: UUID

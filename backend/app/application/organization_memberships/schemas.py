@@ -16,3 +16,17 @@ class OrganizationMembershipReadModel(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class OrganizationMembershipOptionReadModel(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    id: UUID
+    organization_id: UUID
+    user_id: UUID
+    user_full_name: str
+    user_email: str
+    role: OrganizationMembershipRole
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime

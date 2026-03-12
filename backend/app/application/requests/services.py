@@ -7,9 +7,11 @@ from app.application.organization_memberships.exceptions import (
 )
 from app.application.organizations.exceptions import OrganizationNotFoundError
 from app.application.requests.commands import CreateRequestCommand
+from app.application.requests.commands import AssignRequestCommand
 from app.application.requests.commands import TransitionRequestStatusCommand
 from app.application.requests.exceptions import (
     InvalidRequestStatusTransitionError,
+    RequestAssignedMembershipOrganizationMismatchError,
     RequestMembershipOrganizationMismatchError,
     RequestNotFoundError,
     RequestOrganizationMismatchError,
@@ -68,6 +70,7 @@ class CreateRequestUseCase:
             status=RequestStatus.NEW,
             source=command.source,
             created_by_membership_id=command.created_by_membership_id,
+            assigned_membership_id=None,
             created_at=now,
             updated_at=now,
         )
@@ -176,6 +179,78 @@ class TransitionRequestStatusUseCase:
                     "request_id": str(updated_request.id),
                     "old_status": request.status.value,
                     "new_status": command.new_status.value,
+                },
+                created_at=now,
+            )
+        )
+        await self._request_repository.save_changes()
+        return RequestReadModel.model_validate(updated_request, from_attributes=True)
+
+
+class AssignRequestUseCase:
+    def __init__(
+        self,
+        request_repository: RequestRepository,
+        request_activity_repository: RequestActivityRepository,
+        organization_membership_repository: OrganizationMembershipRepository,
+    ) -> None:
+        self._request_repository = request_repository
+        self._request_activity_repository = request_activity_repository
+        self._organization_membership_repository = organization_membership_repository
+
+    async def execute(
+        self,
+        request_id: UUID,
+        command: AssignRequestCommand,
+    ) -> RequestReadModel:
+        request = await self._request_repository.get_by_id(request_id)
+        if request is None:
+            raise RequestNotFoundError(f"Request '{request_id}' was not found.")
+
+        if request.organization_id != command.organization_id:
+            raise RequestNotFoundError(f"Request '{request_id}' was not found.")
+
+        actor_membership = await self._organization_membership_repository.get_by_id(
+            command.membership_id
+        )
+        if actor_membership is None:
+            raise OrganizationMembershipNotFoundError(
+                f"Membership '{command.membership_id}' was not found."
+            )
+
+        if actor_membership.organization_id != command.organization_id:
+            raise RequestMembershipOrganizationMismatchError(
+                "The provided membership does not belong to the provided organization."
+            )
+
+        assigned_membership = await self._organization_membership_repository.get_by_id(
+            command.assigned_membership_id
+        )
+        if assigned_membership is None:
+            raise OrganizationMembershipNotFoundError(
+                f"Membership '{command.assigned_membership_id}' was not found."
+            )
+
+        if assigned_membership.organization_id != command.organization_id:
+            raise RequestAssignedMembershipOrganizationMismatchError(
+                "The assigned membership does not belong to the provided organization."
+            )
+
+        now = datetime.now(UTC)
+        updated_request = await self._request_repository.update_assignment(
+            request_id=request.id,
+            assigned_membership_id=assigned_membership.id,
+            updated_at=now,
+        )
+        await self._request_activity_repository.add(
+            RequestActivity(
+                id=uuid4(),
+                request_id=updated_request.id,
+                organization_id=updated_request.organization_id,
+                membership_id=command.membership_id,
+                type=RequestActivityType.REQUEST_ASSIGNED,
+                payload={
+                    "assigned_membership_id": str(assigned_membership.id),
                 },
                 created_at=now,
             )

@@ -31,3 +31,12 @@ class RequestRepository(ABC):
         updated_at: datetime,
     ) -> Request:
         raise NotImplementedError
+
+    @abstractmethod
+    async def update_assignment(
+        self,
+        request_id: UUID,
+        assigned_membership_id: UUID | None,
+        updated_at: datetime,
+    ) -> Request:
+        raise NotImplementedError

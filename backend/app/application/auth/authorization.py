@@ -10,6 +10,7 @@ class MembershipPermission(StrEnum):
     CREATE_DOCUMENT = "CREATE_DOCUMENT"
     UPLOAD_DOCUMENT = "UPLOAD_DOCUMENT"
     TRANSITION_REQUEST_STATUS = "TRANSITION_REQUEST_STATUS"
+    ASSIGN_REQUEST = "ASSIGN_REQUEST"
     ENQUEUE_DOCUMENT_PROCESSING = "ENQUEUE_DOCUMENT_PROCESSING"
 
 
@@ -39,6 +40,12 @@ _ALLOWED_ROLES_BY_PERMISSION: dict[
         }
     ),
     MembershipPermission.TRANSITION_REQUEST_STATUS: frozenset(
+        {
+            OrganizationMembershipRole.OWNER,
+            OrganizationMembershipRole.ADMIN,
+        }
+    ),
+    MembershipPermission.ASSIGN_REQUEST: frozenset(
         {
             OrganizationMembershipRole.OWNER,
             OrganizationMembershipRole.ADMIN,

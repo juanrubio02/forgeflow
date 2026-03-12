@@ -80,6 +80,22 @@ async def _create_request(
     return response.json()
 
 
+async def _create_request_comment(
+    api_client: AsyncClient,
+    request_id: str,
+    membership_id: str,
+    access_token: str,
+    body: str = "Initial internal comment",
+) -> dict:
+    response = await api_client.post(
+        f"/requests/{request_id}/comments",
+        json={"body": body},
+        headers=_membership_headers(access_token, membership_id),
+    )
+    assert response.status_code == 201
+    return response.json()
+
+
 @pytest.mark.anyio
 async def test_get_requests_returns_only_active_tenant_requests(api_client: AsyncClient) -> None:
     first_organization = await _create_organization(
@@ -208,6 +224,170 @@ async def test_get_request_by_id_returns_existing_request(api_client: AsyncClien
     assert response.status_code == 200
     assert response.json()["id"] == request_payload["id"]
     assert response.json()["status"] == RequestStatus.NEW.value
+
+
+@pytest.mark.anyio
+async def test_post_request_comments_creates_comment_and_activity(
+    api_client: AsyncClient,
+) -> None:
+    organization = await _create_organization(api_client, "Comment Org", "comment-org")
+    user = await _create_user(api_client, "commenter@example.com", "Commenter")
+    membership = await _create_membership(api_client, organization["id"], user["id"])
+    auth_payload = await _login(api_client, "commenter@example.com")
+    request_payload = await _create_request(api_client, membership["id"], auth_payload["access_token"])
+
+    response = await api_client.post(
+        f"/requests/{request_payload['id']}/comments",
+        json={"body": "Need to validate lead times with procurement."},
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["request_id"] == request_payload["id"]
+    assert payload["membership_id"] == membership["id"]
+    assert payload["body"] == "Need to validate lead times with procurement."
+
+    comments_response = await api_client.get(
+        f"/requests/{request_payload['id']}/comments",
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+    assert comments_response.status_code == 200
+    assert comments_response.json()[0]["id"] == payload["id"]
+
+    activities_response = await api_client.get(
+        f"/requests/{request_payload['id']}/activities",
+        headers=_membership_headers(auth_payload["access_token"], membership["id"]),
+    )
+    assert activities_response.status_code == 200
+    assert any(
+        activity["type"] == "REQUEST_COMMENT_ADDED"
+        and activity["payload"]["comment_id"] == payload["id"]
+        for activity in activities_response.json()
+    )
+
+
+@pytest.mark.anyio
+async def test_request_comments_are_tenant_scoped(api_client: AsyncClient) -> None:
+    first_organization = await _create_organization(api_client, "Comment Tenant One", "comment-tenant-one")
+    second_organization = await _create_organization(api_client, "Comment Tenant Two", "comment-tenant-two")
+    first_user = await _create_user(api_client, "comment-tenant-one@example.com", "Comment Tenant One")
+    second_user = await _create_user(api_client, "comment-tenant-two@example.com", "Comment Tenant Two")
+    first_membership = await _create_membership(api_client, first_organization["id"], first_user["id"])
+    second_membership = await _create_membership(api_client, second_organization["id"], second_user["id"])
+    first_auth = await _login(api_client, "comment-tenant-one@example.com")
+    second_auth = await _login(api_client, "comment-tenant-two@example.com")
+    request_payload = await _create_request(api_client, first_membership["id"], first_auth["access_token"])
+
+    response = await api_client.post(
+        f"/requests/{request_payload['id']}/comments",
+        json={"body": "Attempting cross-tenant comment"},
+        headers=_membership_headers(second_auth["access_token"], second_membership["id"]),
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_request_comments_require_authentication(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Comment Auth Org", "comment-auth-org")
+    user = await _create_user(api_client, "comment-auth@example.com", "Comment Auth")
+    membership = await _create_membership(api_client, organization["id"], user["id"])
+    auth_payload = await _login(api_client, "comment-auth@example.com")
+    request_payload = await _create_request(api_client, membership["id"], auth_payload["access_token"])
+
+    response = await api_client.post(
+        f"/requests/{request_payload['id']}/comments",
+        json={"body": "Unauthenticated comment attempt"},
+    )
+
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_patch_assign_request_updates_assigned_membership(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Assign Org", "assign-org")
+    owner = await _create_user(api_client, "assign-owner@example.com", "Assign Owner")
+    assignee = await _create_user(api_client, "assign-user@example.com", "Assign User")
+    owner_membership = await _create_membership(
+        api_client,
+        organization["id"],
+        owner["id"],
+        role="OWNER",
+    )
+    assignee_membership = await _create_membership(
+        api_client,
+        organization["id"],
+        assignee["id"],
+        role="MEMBER",
+    )
+    auth_payload = await _login(api_client, "assign-owner@example.com")
+    request_payload = await _create_request(api_client, owner_membership["id"], auth_payload["access_token"])
+
+    response = await api_client.patch(
+        f"/requests/{request_payload['id']}/assign",
+        json={"assigned_membership_id": assignee_membership["id"]},
+        headers=_membership_headers(auth_payload["access_token"], owner_membership["id"]),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["assigned_membership_id"] == assignee_membership["id"]
+
+    activities_response = await api_client.get(
+        f"/requests/{request_payload['id']}/activities",
+        headers=_membership_headers(auth_payload["access_token"], owner_membership["id"]),
+    )
+    assert activities_response.status_code == 200
+    assert any(
+        activity["type"] == "REQUEST_ASSIGNED"
+        and activity["payload"]["assigned_membership_id"] == assignee_membership["id"]
+        for activity in activities_response.json()
+    )
+
+
+@pytest.mark.anyio
+async def test_patch_assign_request_is_tenant_scoped(api_client: AsyncClient) -> None:
+    first_organization = await _create_organization(api_client, "Assign Tenant One", "assign-tenant-one")
+    second_organization = await _create_organization(api_client, "Assign Tenant Two", "assign-tenant-two")
+    first_user = await _create_user(api_client, "assign-tenant-one@example.com", "Assign Tenant One")
+    second_user = await _create_user(api_client, "assign-tenant-two@example.com", "Assign Tenant Two")
+    first_membership = await _create_membership(api_client, first_organization["id"], first_user["id"], role="OWNER")
+    second_membership = await _create_membership(api_client, second_organization["id"], second_user["id"], role="OWNER")
+    first_auth = await _login(api_client, "assign-tenant-one@example.com")
+    second_auth = await _login(api_client, "assign-tenant-two@example.com")
+    request_payload = await _create_request(api_client, first_membership["id"], first_auth["access_token"])
+
+    response = await api_client.patch(
+        f"/requests/{request_payload['id']}/assign",
+        json={"assigned_membership_id": second_membership["id"]},
+        headers=_membership_headers(first_auth["access_token"], first_membership["id"]),
+    )
+
+    assert response.status_code == 409
+
+    forbidden_response = await api_client.patch(
+        f"/requests/{request_payload['id']}/assign",
+        json={"assigned_membership_id": first_membership["id"]},
+        headers=_membership_headers(second_auth["access_token"], second_membership["id"]),
+    )
+
+    assert forbidden_response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_patch_assign_request_requires_authentication(api_client: AsyncClient) -> None:
+    organization = await _create_organization(api_client, "Assign Auth Org", "assign-auth-org")
+    user = await _create_user(api_client, "assign-auth@example.com", "Assign Auth")
+    membership = await _create_membership(api_client, organization["id"], user["id"], role="OWNER")
+    auth_payload = await _login(api_client, "assign-auth@example.com")
+    request_payload = await _create_request(api_client, membership["id"], auth_payload["access_token"])
+
+    response = await api_client.patch(
+        f"/requests/{request_payload['id']}/assign",
+        json={"assigned_membership_id": membership["id"]},
+    )
+
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio

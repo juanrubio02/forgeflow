@@ -6,10 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/page-header";
-import { useRequestActivitiesQuery, useRequestQuery } from "@/features/requests/api";
+import {
+  useRequestActivitiesQuery,
+  useRequestCommentsQuery,
+  useRequestQuery,
+} from "@/features/requests/api";
 import { RequestStatusBadge } from "@/features/requests/status-badges";
 import { RequestStatusActions } from "@/features/requests/components/request-status-actions";
 import { RequestActivityTimeline } from "@/features/requests/components/request-activity-timeline";
+import { RequestCommentsPanel } from "@/features/requests/components/request-comments-panel";
+import { RequestAssignmentCard } from "@/features/requests/components/request-assignment-card";
 import { useRequestDocumentsQuery } from "@/features/documents/api";
 import { RequestDocumentsPanel } from "@/features/documents/components/request-documents-panel";
 import { DocumentUploadCard } from "@/features/documents/components/document-upload-card";
@@ -27,6 +33,7 @@ function InlineQueryError({ message }: { message: string }) {
 export function RequestDetailScreen({ requestId }: { requestId: string }) {
   const requestQuery = useRequestQuery(requestId);
   const activitiesQuery = useRequestActivitiesQuery(requestId);
+  const commentsQuery = useRequestCommentsQuery(requestId);
   const documentsQuery = useRequestDocumentsQuery(requestId);
   const { locale, messages } = useI18n();
 
@@ -139,7 +146,10 @@ export function RequestDetailScreen({ requestId }: { requestId: string }) {
           </CardContent>
         </Card>
 
-        <DocumentUploadCard requestId={requestId} />
+        <div className="space-y-4">
+          <RequestAssignmentCard request={request} />
+          <DocumentUploadCard requestId={requestId} />
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -156,6 +166,13 @@ export function RequestDetailScreen({ requestId }: { requestId: string }) {
           <RequestActivityTimeline activities={activitiesQuery.data ?? []} />
         </div>
       </section>
+
+      <RequestCommentsPanel
+        requestId={requestId}
+        comments={commentsQuery.data ?? []}
+        isLoading={Boolean(commentsQuery.isLoading)}
+        isError={Boolean(commentsQuery.isError)}
+      />
     </div>
   );
 }

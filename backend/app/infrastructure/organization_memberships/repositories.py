@@ -100,6 +100,25 @@ class SqlAlchemyOrganizationMembershipRepository(OrganizationMembershipRepositor
         models = result.scalars().all()
         return [self._to_domain(model) for model in models]
 
+    async def list_active_by_organization_id(
+        self,
+        organization_id: UUID,
+    ) -> list[OrganizationMembership]:
+        statement = (
+            select(OrganizationMembershipModel)
+            .where(
+                OrganizationMembershipModel.organization_id == organization_id,
+                OrganizationMembershipModel.is_active.is_(True),
+            )
+            .order_by(
+                OrganizationMembershipModel.created_at.asc(),
+                OrganizationMembershipModel.id.asc(),
+            )
+        )
+        result = await self._session.execute(statement)
+        models = result.scalars().all()
+        return [self._to_domain(model) for model in models]
+
     @staticmethod
     def _to_domain(model: OrganizationMembershipModel) -> OrganizationMembership:
         return OrganizationMembership(

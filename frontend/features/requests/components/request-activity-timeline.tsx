@@ -11,6 +11,10 @@ function activityIcon(type: RequestActivity["type"]) {
     return FileUp;
   }
 
+  if (type === "REQUEST_COMMENT_ADDED" || type === "COMMENT_ADDED") {
+    return Sparkles;
+  }
+
   if (type === "STATUS_CHANGED") {
     return ListChecks;
   }
@@ -21,6 +25,10 @@ function activityIcon(type: RequestActivity["type"]) {
 function activityVariant(type: RequestActivity["type"]) {
   if (type === "DOCUMENT_UPLOADED") {
     return "info" as const;
+  }
+
+  if (type === "REQUEST_COMMENT_ADDED" || type === "COMMENT_ADDED") {
+    return "neutral" as const;
   }
 
   if (type === "STATUS_CHANGED") {

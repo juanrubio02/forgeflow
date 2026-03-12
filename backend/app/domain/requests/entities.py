@@ -15,6 +15,6 @@ class Request:
     status: RequestStatus
     source: RequestSource
     created_by_membership_id: UUID
+    assigned_membership_id: UUID | None
     created_at: datetime
     updated_at: datetime
-

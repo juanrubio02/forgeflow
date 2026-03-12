@@ -39,6 +39,10 @@ class RequestModel(Base):
         ForeignKey("organization_memberships.id", ondelete="RESTRICT"),
         nullable=False,
     )
+    assigned_membership_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("organization_memberships.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -50,4 +54,3 @@ class RequestModel(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
-
