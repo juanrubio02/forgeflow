@@ -116,6 +116,7 @@ vi.mock("@/hooks/use-membership", () => ({
   useMembership: () => ({
     activeMembership: {
       id: "mem-1",
+      organization_id: "org-1",
       role: "ADMIN",
     },
   }),
@@ -134,6 +135,6 @@ describe("RequestDetailScreen", () => {
     expect(screen.getByText("spec.pdf")).toBeInTheDocument();
     expect(screen.getByText("Solicitud creada")).toBeInTheDocument();
     expect(screen.getByText("Need to align with supplier timeline.")).toBeInTheDocument();
-    expect(screen.getByText("Alice Admin · ADMIN", { selector: "p" })).toBeInTheDocument();
+    expect(screen.getByText("Alice Admin · Administrador", { selector: "p" })).toBeInTheDocument();
   });
 });

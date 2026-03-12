@@ -13,7 +13,7 @@ export const es = {
         dashboard: "Resumen",
         requests: "Solicitudes",
         newRequest: "Nueva solicitud",
-        demoIntake: "Intake demo",
+        demoIntake: "Demo guiada",
       },
       intelligence: {
         eyebrow: "Inteligencia documental",
@@ -22,46 +22,46 @@ export const es = {
       },
     },
     topbar: {
-      workspaceEyebrow: "Contexto de trabajo",
-      membershipLabel: "Membership activa",
+      workspaceEyebrow: "Contexto operativo",
+      membershipLabel: "Acceso activo",
       activeRole: "Rol activo",
       userFallback: "Usuario autenticado",
       signOut: "Cerrar sesión",
     },
     guards: {
-      workspaceLoadingFailed: "No se pudo cargar el workspace",
-      workspaceLoadingTitle: "No se pudieron recuperar las memberships activas.",
+      workspaceLoadingFailed: "No se pudo cargar el contexto",
+      workspaceLoadingTitle: "No se pudieron recuperar los accesos activos.",
       workspaceLoadingDescription:
-        "La autenticación ha funcionado, pero el contexto del workspace no se ha podido recuperar desde el backend. Recarga la página y verifica que la API esté disponible.",
-      noWorkspaceEyebrow: "Sin workspace activo",
-      noWorkspaceTitle: "Este usuario no tiene memberships activas.",
+        "La autenticación ha funcionado, pero el contexto operativo no se ha podido recuperar desde el backend. Recarga la página y verifica que la API esté disponible.",
+      noWorkspaceEyebrow: "Sin acceso activo",
+      noWorkspaceTitle: "Este usuario no tiene accesos activos.",
       noWorkspaceDescription:
-        "La autenticación funciona, pero esta cuenta todavía no está vinculada a ninguna organización. Crea o asigna una membership desde el backend y recarga la sesión.",
+        "La autenticación funciona, pero esta cuenta todavía no está vinculada a ninguna organización. Crea o asigna un acceso desde el backend y recarga la sesión.",
     },
   },
   login: {
     hero: {
       eyebrow: "Industrial Request Intelligence",
-      title: "Workspace premium para operaciones comerciales industriales.",
+      title: "Plataforma operativa para solicitudes industriales.",
       description:
-        "Gestiona el ciclo completo de solicitudes con autenticación, aislamiento multi-tenant, inteligencia documental, OCR, resúmenes y extracción estructurada ya conectados al backend.",
+        "Gestiona el ciclo completo de solicitudes con autenticación, aislamiento por organización, inteligencia documental, OCR, resúmenes y extracción estructurada conectados al backend.",
       highlights: [
         "Visibilidad del pipeline de solicitudes",
         "Detalle de inteligencia documental",
-        "Contexto de ejecución aislado por tenant",
+        "Operación separada por organización",
       ],
     },
     form: {
       eyebrow: "Acceso seguro",
-      title: "Inicia sesión en tu workspace",
+      title: "Inicia sesión",
       description:
-        "Usa las credenciales de tu workspace industrial y después selecciona la membership activa.",
+        "Usa las credenciales demo o las de tu organización y después selecciona el acceso activo.",
       email: "Correo electrónico",
       password: "Contraseña",
       submit: "Iniciar sesión",
       submitting: "Iniciando sesión...",
       successTitle: "Sesión iniciada",
-      successDescription: "Tu sesión de workspace ya está activa.",
+      successDescription: "Tu sesión ya está activa.",
       errorTitle: "No se pudo iniciar sesión",
       fallbackError: "No se pudo iniciar la sesión.",
       validation: {
@@ -75,11 +75,11 @@ export const es = {
       eyebrow: "Resumen operativo",
       title: "Operaciones de solicitudes impulsadas por documentos",
       description:
-        "Controla el flujo comercial, revisa actividad reciente y monitoriza la preparación de inteligencia documental desde un único workspace operativo.",
+        "Controla el flujo comercial, revisa actividad reciente y monitoriza la preparación de inteligencia documental desde un único panel operativo.",
     },
     stats: {
       totalRequests: "Solicitudes totales",
-      totalRequestsHelper: "Pipeline aislado por tenant.",
+      totalRequestsHelper: "Pipeline por organización.",
       openPipeline: "Pipeline abierto",
       openPipelineHelper: "Solicitudes todavía en curso.",
       systemHealth: "Estado del sistema",
@@ -93,7 +93,7 @@ export const es = {
       title: "Intake comercial en vivo",
       action: "Abrir listado completo",
       empty:
-        "Todavía no hay solicitudes en este workspace. Crea la primera para iniciar el flujo operativo.",
+        "Todavía no hay solicitudes en esta organización. Crea la primera para iniciar el flujo operativo.",
     },
     systemState: {
       eyebrow: "Estado del sistema",
@@ -116,14 +116,14 @@ export const es = {
   demoIntake: {
     header: {
       eyebrow: "Simulador operativo",
-      title: "Simulador de intake demo",
+      title: "Escenarios demo de intake",
       description:
-        "Genera solicitudes entrantes realistas como si llegaran por email o RFQ y empuja el pipeline real de documentos, timeline y extracción.",
+        "Genera solicitudes realistas como si llegaran por email o RFQ y recorre el flujo real de documentos, timeline y extracción.",
       badge: "Demo + QA",
     },
     list: {
       loadError:
-        "No se pudieron cargar los escenarios demo del workspace activo. Recarga la página e inténtalo de nuevo.",
+        "No se pudieron cargar los escenarios demo. Recarga la página e inténtalo de nuevo.",
     },
     card: {
       eyebrow: "Escenario",
@@ -139,7 +139,7 @@ export const es = {
       pending: "Generando...",
       successTitle: "Solicitud demo generada",
       successDescription:
-        "Se ha creado la request real del escenario {scenario} y se abrirá su detalle.",
+        "Se ha creado la solicitud del escenario {scenario} y se abrirá su detalle.",
       errorTitle: "No se pudo generar el escenario demo",
       fallbackError: "No se pudo ejecutar el escenario demo.",
     },
@@ -149,18 +149,18 @@ export const es = {
       eyebrow: "Pipeline",
       title: "Solicitudes",
       description:
-        "Vista en vivo y aislada por tenant de las solicitudes industriales ya disponibles en el backend.",
+        "Vista operativa en vivo de las solicitudes industriales disponibles en el backend.",
       count: "{count} solicitudes",
       create: "Crear solicitud",
     },
     loadError:
-      "No se pudieron cargar las solicitudes del workspace activo. Recarga la página e inténtalo de nuevo.",
+      "No se pudieron cargar las solicitudes. Recarga la página e inténtalo de nuevo.",
     list: {
       eyebrow: "Tabla de pipeline",
       title: "Solicitudes",
       records: "{count} registros activos",
       description:
-        "Registros de intake y pipeline aislados por tenant ya disponibles en el backend.",
+        "Registros de intake y pipeline ya disponibles en el backend.",
       columns: {
         title: "Título",
         status: "Estado",
@@ -169,12 +169,12 @@ export const es = {
         actions: "Acciones",
       },
       open: "Abrir",
-      emptyTitle: "No hay solicitudes en este workspace",
+      emptyTitle: "No hay solicitudes en esta organización",
       emptyFilteredTitle: "No hay resultados para los filtros aplicados",
       emptyDescription:
         "Las solicitudes aparecerán aquí en cuanto el equipo empiece a registrar demanda industrial.",
       emptyFilteredDescription:
-        "Prueba a limpiar la búsqueda o relajar los filtros para recuperar solicitudes del workspace activo.",
+        "Prueba a limpiar la búsqueda o relajar los filtros para recuperar solicitudes.",
       emptyAction: "Crear solicitud",
     },
     filters: {
@@ -218,8 +218,8 @@ export const es = {
     detail: {
       eyebrow: "Detalle de solicitud",
       noDescription: "No se ha capturado una descripción ampliada para esta solicitud.",
-      loadError: "No se pudo cargar el detalle de la solicitud para el workspace activo.",
-      notFound: "No se encontró la solicitud dentro del workspace activo.",
+      loadError: "No se pudo cargar el detalle de la solicitud.",
+      notFound: "No se encontró la solicitud.",
       source: "Origen",
       updated: "Actualizado",
       created: "Creado",
@@ -230,7 +230,7 @@ export const es = {
       lastUpdated: "Última actualización",
       workflow: "Flujo de trabajo",
       workflowDescription:
-        "Usa los controles de estado para mover la solicitud por el pipeline, sube documentos origen desde este workspace e inspecciona el resultado de procesamiento en cada detalle documental.",
+        "Usa los controles de estado para mover la solicitud por el pipeline, sube documentos origen e inspecciona el resultado de procesamiento en cada detalle documental.",
       documentsError: "No se pudieron cargar los documentos de esta solicitud.",
       timelineError: "No se pudo cargar la línea temporal de esta solicitud.",
     },
@@ -264,12 +264,15 @@ export const es = {
       successDescription: "El comentario ya está disponible para el equipo.",
       errorTitle: "No se pudo publicar el comentario",
       fallbackError: "No se pudo guardar el comentario interno.",
+      unknownAuthor: "Miembro del equipo",
     },
     timeline: {
       eyebrow: "Línea temporal",
       title: "Eventos de la solicitud",
       events: "{count} eventos",
       empty: "Todavía no hay eventos para esta solicitud.",
+      actor: "Autor",
+      activityRecorded: "Actividad registrada",
     },
     statusActions: {
       successTitle: "Estado actualizado",
@@ -339,7 +342,7 @@ export const es = {
       saving: "Guardando...",
       successTitle: "Datos verificados guardados",
       successDescription:
-        "Los datos verificados del documento ya están persistidos en el workspace.",
+        "Los datos verificados del documento ya se han guardado.",
       errorTitle: "No se pudieron guardar los datos verificados",
       fallbackError: "No se pudieron guardar los datos verificados.",
       fields: {
@@ -353,8 +356,8 @@ export const es = {
       eyebrow: "Detalle de inteligencia documental",
       description:
         "Inspecciona en un solo lugar los metadatos, el resultado de procesamiento, las señales de OCR y la extracción estructurada.",
-      loadError: "No se pudo cargar el detalle del documento para el workspace activo.",
-      notFound: "No se encontró el documento dentro del workspace activo.",
+      loadError: "No se pudo cargar el detalle del documento.",
+      notFound: "No se encontró el documento.",
       updated: "Actualizado",
       launchProcessing: "Lanzar procesamiento",
       processingStarted: "Procesamiento ya iniciado",
@@ -364,7 +367,8 @@ export const es = {
       processingErrorDescription: "No se pudo encolar la tarea documental.",
       metadataEyebrow: "Metadatos",
       metadataTitle: "Registro documental",
-      storageKey: "Clave de almacenamiento",
+      storage: "Almacenamiento",
+      storageValue: "Repositorio interno de documentos",
       contentType: "Tipo de contenido",
       size: "Tamaño",
       created: "Creado",

@@ -22,6 +22,9 @@ export function DemoIntakeScreen() {
   const [activeScenarioKey, setActiveScenarioKey] = useState<string | null>(null);
 
   const handleRunScenario = async (scenarioKey: string) => {
+    const scenarioTitle =
+      scenariosQuery.data?.find((scenario) => scenario.key === scenarioKey)?.title ?? scenarioKey;
+
     try {
       setActiveScenarioKey(scenarioKey);
       const result = await runScenarioMutation.mutateAsync(scenarioKey);
@@ -33,7 +36,7 @@ export function DemoIntakeScreen() {
         tone: "success",
         title: messages.demoIntake.run.successTitle,
         description: interpolate(messages.demoIntake.run.successDescription, {
-          scenario: scenarioKey,
+          scenario: scenarioTitle,
         }),
       });
       router.push(`/requests/${result.request_id}`);

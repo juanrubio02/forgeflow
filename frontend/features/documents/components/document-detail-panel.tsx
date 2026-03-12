@@ -220,10 +220,10 @@ export function DocumentDetailPanel({ documentId }: { documentId: string }) {
           <CardContent className="space-y-4 text-sm">
             <div className="surface-muted rounded-[var(--radius-control)] px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                {messages.documents.detail.storageKey}
+                {messages.documents.detail.storage}
               </p>
-              <p className="mt-2 break-all font-[family-name:var(--font-mono)] text-[0.82rem]">
-                {documentRecord.storage_key}
+              <p className="mt-2 font-semibold text-slate-900">
+                {messages.documents.detail.storageValue}
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">

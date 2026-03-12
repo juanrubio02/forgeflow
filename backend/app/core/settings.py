@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, computed_field
+from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -38,6 +38,17 @@ class Settings(BaseSettings):
     redis_host: str = Field(default="localhost", alias="REDIS_HOST")
     redis_port: int = Field(default=6379, alias="REDIS_PORT")
     redis_db: int = Field(default=0, alias="REDIS_DB")
+
+    @model_validator(mode="after")
+    def validate_security_defaults(self) -> "Settings":
+        if self.app_env.lower() in {"production", "staging"} and (
+            self.auth_secret_key == "change-this-auth-secret-in-production"
+        ):
+            raise ValueError(
+                "AUTH_SECRET_KEY must be changed before running in staging or production."
+            )
+
+        return self
 
     @computed_field  # type: ignore[prop-decorator]
     @property

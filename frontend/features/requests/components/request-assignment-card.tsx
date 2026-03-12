@@ -52,7 +52,7 @@ export function RequestAssignmentCard({ request }: { request: RequestRecord }) {
           </p>
           <p className="mt-2 text-sm font-semibold tracking-[-0.01em] text-slate-900">
             {assignedMember
-              ? `${assignedMember.user_full_name} · ${assignedMember.role}`
+              ? `${assignedMember.user_full_name} · ${messages.common.memberships[assignedMember.role]}`
               : messages.requests.assignment.unassigned}
           </p>
         </div>
@@ -69,7 +69,7 @@ export function RequestAssignmentCard({ request }: { request: RequestRecord }) {
             <option value="">{messages.requests.assignment.selectPlaceholder}</option>
             {(membershipsQuery.data ?? []).map((membership) => (
               <option key={membership.id} value={membership.id}>
-                {membership.user_full_name} · {membership.role}
+                {membership.user_full_name} · {messages.common.memberships[membership.role]}
               </option>
             ))}
           </Select>
@@ -113,4 +113,3 @@ export function RequestAssignmentCard({ request }: { request: RequestRecord }) {
     </Card>
   );
 }
-

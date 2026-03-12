@@ -75,7 +75,7 @@ describe("RequestAssignmentCard", () => {
       />,
     );
 
-    expect(screen.getByText(/Alice Admin · ADMIN/i, { selector: "p" })).toBeInTheDocument();
+    expect(screen.getByText(/Alice Admin · Administrador/i, { selector: "p" })).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(/responsable/i), {
       target: { value: "mem-2" },

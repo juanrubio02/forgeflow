@@ -46,7 +46,7 @@ function buildHeaders(options: ApiRequestOptions): Headers {
     if (!membershipId) {
       throw new ApiError(
         400,
-        "An active workspace must be selected before this request can be executed.",
+        "An active access context must be selected before this request can be executed.",
       );
     }
 

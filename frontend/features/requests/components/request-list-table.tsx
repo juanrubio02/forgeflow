@@ -54,15 +54,6 @@ export function RequestListTable({
         cell: ({ row }) => <RequestStatusBadge status={row.original.status} />,
       },
       {
-        id: "documents",
-        header: messages.requests.list.columns.documents,
-        cell: () => (
-          <span className="text-sm font-medium text-slate-400">
-            -
-          </span>
-        ),
-      },
-      {
         accessorKey: "updated_at",
         header: messages.requests.list.columns.updated,
         cell: ({ row }) => (

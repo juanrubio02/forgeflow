@@ -80,7 +80,7 @@ export function RequestFiltersBar({
               <option value="">{messages.requests.filters.allAssignees}</option>
               {memberships.map((membership) => (
                 <option key={membership.id} value={membership.id}>
-                  {membership.user_full_name} · {membership.role}
+                  {membership.user_full_name} · {messages.common.memberships[membership.role]}
                 </option>
               ))}
             </Select>
@@ -112,4 +112,3 @@ export function RequestFiltersBar({
     </Card>
   );
 }
-

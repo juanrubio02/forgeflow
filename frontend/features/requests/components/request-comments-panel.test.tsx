@@ -17,10 +17,37 @@ vi.mock("@/hooks/use-membership", () => ({
   useMembership: () => ({
     activeMembership: {
       id: "mem-1",
+      organization_id: "org-1",
       role: "ADMIN",
     },
   }),
 }));
+
+vi.mock("@tanstack/react-query", async () => {
+  const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
+    "@tanstack/react-query",
+  );
+  return {
+    ...actual,
+    useQuery: () => ({
+      data: [
+        {
+          id: "mem-1",
+          organization_id: "org-1",
+          user_id: "user-1",
+          user_full_name: "Alice Admin",
+          user_email: "alice@example.com",
+          role: "ADMIN",
+          is_active: true,
+          created_at: "2026-03-12T09:00:00Z",
+          updated_at: "2026-03-12T09:00:00Z",
+        },
+      ],
+      isLoading: false,
+      isError: false,
+    }),
+  };
+});
 
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
@@ -50,6 +77,7 @@ describe("RequestCommentsPanel", () => {
     );
 
     expect(screen.getByText("Need supplier clarification.")).toBeInTheDocument();
+    expect(screen.getByText(/Alice Admin/i)).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(/añadir comentario interno/i), {
       target: { value: "Please verify the coating spec." },

@@ -13,7 +13,7 @@ export const en = {
         dashboard: "Dashboard",
         requests: "Requests",
         newRequest: "New Request",
-        demoIntake: "Demo intake",
+        demoIntake: "Guided demo",
       },
       intelligence: {
         eyebrow: "Document Intelligence",
@@ -22,46 +22,46 @@ export const en = {
       },
     },
     topbar: {
-      workspaceEyebrow: "Workspace Context",
-      membershipLabel: "Active membership",
+      workspaceEyebrow: "Operational Context",
+      membershipLabel: "Active access",
       activeRole: "Active role",
       userFallback: "Authenticated user",
       signOut: "Sign out",
     },
     guards: {
-      workspaceLoadingFailed: "Workspace loading failed",
-      workspaceLoadingTitle: "Active memberships could not be loaded.",
+      workspaceLoadingFailed: "Context loading failed",
+      workspaceLoadingTitle: "Active access records could not be loaded.",
       workspaceLoadingDescription:
-        "Authentication succeeded, but the workspace context could not be recovered from the backend. Refresh the page and verify the API is reachable.",
-      noWorkspaceEyebrow: "No active workspace",
-      noWorkspaceTitle: "This user has no active memberships.",
+        "Authentication succeeded, but the operational context could not be recovered from the backend. Refresh the page and verify the API is reachable.",
+      noWorkspaceEyebrow: "No active access",
+      noWorkspaceTitle: "This user has no active access records.",
       noWorkspaceDescription:
-        "Authentication is working, but this account is not linked to any organization yet. Create or assign a membership from the backend and reload the session.",
+        "Authentication is working, but this account is not linked to any organization yet. Create or assign access from the backend and reload the session.",
     },
   },
   login: {
     hero: {
       eyebrow: "Industrial Request Intelligence",
-      title: "Premium workspace for industrial commercial operations.",
+      title: "Operational platform for industrial requests.",
       description:
-        "Run the full request lifecycle with authentication, tenant isolation, document intelligence, OCR, summaries and structured extraction already wired to the backend.",
+        "Run the full request lifecycle with authentication, organization-level isolation, document intelligence, OCR, summaries and structured extraction already wired to the backend.",
       highlights: [
         "Request pipeline visibility",
         "Document intelligence detail",
-        "Tenant-scoped execution context",
+        "Organization-scoped operations",
       ],
     },
     form: {
       eyebrow: "Secure Access",
-      title: "Sign in to your workspace",
+      title: "Sign in",
       description:
-        "Use your industrial workspace credentials and then select the active membership context.",
+        "Use the demo credentials or your organization credentials, then select the active access context.",
       email: "Email",
       password: "Password",
       submit: "Sign in",
       submitting: "Signing in...",
       successTitle: "Authenticated",
-      successDescription: "Your workspace session is now active.",
+      successDescription: "Your session is now active.",
       errorTitle: "Login failed",
       fallbackError: "Could not start the session.",
       validation: {
@@ -75,7 +75,7 @@ export const en = {
       eyebrow: "Operational Overview",
       title: "Document-led request operations",
       description:
-        "Track commercial flow, inspect recent request activity and monitor document intelligence readiness from a single operational workspace.",
+        "Track commercial flow, inspect recent request activity and monitor document intelligence readiness from a single operational console.",
     },
     stats: {
       totalRequests: "Total Requests",
@@ -93,7 +93,7 @@ export const en = {
       title: "Live commercial intake",
       action: "Open full list",
       empty:
-        "No requests yet for this workspace. Create the first one to start the operational flow.",
+        "No requests yet for this organization. Create the first one to start the operational flow.",
     },
     systemState: {
       eyebrow: "System State",
@@ -116,14 +116,14 @@ export const en = {
   demoIntake: {
     header: {
       eyebrow: "Operational Simulator",
-      title: "Demo Intake Simulator",
+      title: "Demo intake scenarios",
       description:
-        "Generate realistic incoming requests as if they arrived through email or RFQ channels and push the real document, timeline and extraction pipeline.",
+        "Generate realistic incoming requests as if they arrived through email or RFQ channels and walk through the real document, timeline and extraction flow.",
       badge: "Demo + QA",
     },
     list: {
       loadError:
-        "Demo scenarios could not be loaded for the active workspace. Refresh the page and try again.",
+        "Demo scenarios could not be loaded. Refresh the page and try again.",
     },
     card: {
       eyebrow: "Scenario",
@@ -139,7 +139,7 @@ export const en = {
       pending: "Generating...",
       successTitle: "Demo request generated",
       successDescription:
-        "The real request for scenario {scenario} was created and its detail view will open.",
+        "The request for scenario {scenario} was created and its detail view will open.",
       errorTitle: "Could not generate demo scenario",
       fallbackError: "The demo scenario could not be executed.",
     },
@@ -149,18 +149,18 @@ export const en = {
       eyebrow: "Pipeline",
       title: "Requests",
       description:
-        "Live tenant-scoped view of industrial requests already available in the backend.",
+        "Live operational view of industrial requests already available in the backend.",
       count: "{count} requests",
       create: "Create request",
     },
     loadError:
-      "Requests could not be loaded for the active workspace. Refresh the page and try again.",
+      "Requests could not be loaded. Refresh the page and try again.",
     list: {
       eyebrow: "Pipeline Table",
       title: "Requests",
       records: "{count} active records",
       description:
-        "Tenant-scoped intake and pipeline records already available in the backend.",
+        "Intake and pipeline records already available in the backend.",
       columns: {
         title: "Title",
         status: "Status",
@@ -169,12 +169,12 @@ export const en = {
         actions: "Actions",
       },
       open: "Open",
-      emptyTitle: "No requests in this workspace",
+      emptyTitle: "No requests in this organization",
       emptyFilteredTitle: "No results for the active filters",
       emptyDescription:
         "Requests will appear here as soon as the team starts registering industrial demand.",
       emptyFilteredDescription:
-        "Try clearing the search or relaxing the filters to recover requests from the active workspace.",
+        "Try clearing the search or relaxing the filters to recover requests.",
       emptyAction: "Create request",
     },
     filters: {
@@ -218,8 +218,8 @@ export const en = {
     detail: {
       eyebrow: "Request Detail",
       noDescription: "No extended description captured for this request.",
-      loadError: "Request detail could not be loaded for the active workspace.",
-      notFound: "Request not found in the active workspace.",
+      loadError: "Request detail could not be loaded.",
+      notFound: "Request not found.",
       source: "Source",
       updated: "Updated",
       created: "Created",
@@ -230,7 +230,7 @@ export const en = {
       lastUpdated: "Last Updated",
       workflow: "Workflow",
       workflowDescription:
-        "Use the status controls for qualified pipeline movement, upload source documents directly from this workspace and inspect processing output on each document detail.",
+        "Use the status controls for pipeline movement, upload source documents and inspect processing output on each document detail.",
       documentsError: "Documents could not be loaded for this request.",
       timelineError: "Activity timeline could not be loaded for this request.",
     },
@@ -264,12 +264,15 @@ export const en = {
       successDescription: "The comment is now available to the team.",
       errorTitle: "Could not post comment",
       fallbackError: "The internal comment could not be saved.",
+      unknownAuthor: "Team member",
     },
     timeline: {
       eyebrow: "Activity Timeline",
       title: "Request events",
       events: "{count} events",
       empty: "No events yet for this request.",
+      actor: "Actor",
+      activityRecorded: "Activity recorded",
     },
     statusActions: {
       successTitle: "Status updated",
@@ -338,7 +341,7 @@ export const en = {
       saving: "Saving...",
       successTitle: "Verified data saved",
       successDescription:
-        "The verified document data is now persisted in the workspace.",
+        "The verified document data has been saved.",
       errorTitle: "Could not save verified data",
       fallbackError: "The verified data could not be saved.",
       fields: {
@@ -352,8 +355,8 @@ export const en = {
       eyebrow: "Document Intelligence Detail",
       description:
         "Inspect raw metadata, processing output, OCR fallback signals and structured extraction in one place.",
-      loadError: "Document detail could not be loaded for the active workspace.",
-      notFound: "Document not found in the active workspace.",
+      loadError: "Document detail could not be loaded.",
+      notFound: "Document not found.",
       updated: "Updated",
       launchProcessing: "Launch processing",
       processingStarted: "Processing already started",
@@ -363,7 +366,8 @@ export const en = {
       processingErrorDescription: "The processing job could not be enqueued.",
       metadataEyebrow: "Metadata",
       metadataTitle: "Document record",
-      storageKey: "Storage key",
+      storage: "Storage",
+      storageValue: "Internal document repository",
       contentType: "Content type",
       size: "Size",
       created: "Created",

@@ -7,8 +7,25 @@ FRONTEND_DIR="$ROOT_DIR/frontend"
 BACKEND_PORT="${BACKEND_PORT:-28000}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 
+resolve_python() {
+  if command -v python3 >/dev/null 2>&1; then
+    command -v python3
+    return
+  fi
+
+  if command -v python >/dev/null 2>&1; then
+    command -v python
+    return
+  fi
+
+  echo "Neither python3 nor python is available in PATH." >&2
+  exit 1
+}
+
+PYTHON_BIN="${PYTHON_BIN:-$(resolve_python)}"
+
 pick_free_port() {
-  "$BACKEND_DIR/.venv/bin/python" - "$@" <<'PY'
+  "$PYTHON_BIN" - "$@" <<'PY'
 from __future__ import annotations
 
 import socket

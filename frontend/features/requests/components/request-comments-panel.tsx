@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateRequestCommentMutation } from "@/features/requests/api";
+import { useMembership } from "@/hooks/use-membership";
 import { useToast } from "@/hooks/use-toast";
 import { interpolate, useI18n } from "@/i18n/hooks";
+import { getOrganizationMembershipOptions } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import type { RequestComment } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/utils";
@@ -25,8 +28,21 @@ export function RequestCommentsPanel({
 }) {
   const { locale, messages } = useI18n();
   const { pushToast } = useToast();
+  const { activeMembership } = useMembership();
   const [body, setBody] = useState("");
   const createCommentMutation = useCreateRequestCommentMutation(requestId);
+  const membershipsQuery = useQuery({
+    queryKey: ["request-comments-memberships", activeMembership?.organization_id ?? null],
+    queryFn: async () =>
+      activeMembership?.organization_id
+        ? (await getOrganizationMembershipOptions(activeMembership.organization_id)) ?? []
+        : [],
+    enabled: Boolean(activeMembership?.organization_id),
+  });
+
+  const authorByMembershipId = new Map(
+    (membershipsQuery.data ?? []).map((membership) => [membership.id, membership.user_full_name]),
+  );
 
   return (
     <Card className="h-full">
@@ -104,9 +120,7 @@ export function RequestCommentsPanel({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold tracking-[-0.01em] text-slate-900">
                     {messages.requests.comments.author} ·{" "}
-                    <span className="font-[family-name:var(--font-mono)] text-[0.82rem]">
-                      {comment.membership_id}
-                    </span>
+                    <span>{authorByMembershipId.get(comment.membership_id) ?? messages.requests.comments.unknownAuthor}</span>
                   </p>
                   <p className="text-sm text-slate-500">
                     {formatDateTime(comment.created_at, locale)}

@@ -83,6 +83,13 @@ class InMemoryOrganizationMembershipRepository(OrganizationMembershipRepository)
             if membership.user_id == user_id and membership.is_active
         ]
 
+    async def list_active_by_organization_id(self, organization_id):
+        return [
+            membership
+            for membership in self._memberships.values()
+            if membership.organization_id == organization_id and membership.is_active
+        ]
+
 
 class InMemoryRequestRepository(RequestRepository):
     def __init__(self) -> None:
@@ -105,6 +112,30 @@ class InMemoryRequestRepository(RequestRepository):
             if request.organization_id == organization_id
         ]
 
+    async def list_by_organization_filters(
+        self,
+        organization_id,
+        *,
+        q=None,
+        status=None,
+        assigned_membership_id=None,
+        source=None,
+    ):
+        requests = await self.list_by_organization_id(organization_id)
+        if q:
+            requests = [request for request in requests if q.lower() in request.title.lower()]
+        if status:
+            requests = [request for request in requests if request.status == status]
+        if assigned_membership_id:
+            requests = [
+                request
+                for request in requests
+                if request.assigned_membership_id == assigned_membership_id
+            ]
+        if source:
+            requests = [request for request in requests if request.source == source]
+        return requests
+
     async def update_status(self, request_id, new_status, updated_at):
         request = self._requests[request_id]
         updated_request = Request(
@@ -115,6 +146,24 @@ class InMemoryRequestRepository(RequestRepository):
             status=new_status,
             source=request.source,
             created_by_membership_id=request.created_by_membership_id,
+            assigned_membership_id=request.assigned_membership_id,
+            created_at=request.created_at,
+            updated_at=updated_at,
+        )
+        self._requests[request_id] = updated_request
+        return updated_request
+
+    async def update_assignment(self, request_id, assigned_membership_id, updated_at):
+        request = self._requests[request_id]
+        updated_request = Request(
+            id=request.id,
+            organization_id=request.organization_id,
+            title=request.title,
+            description=request.description,
+            status=request.status,
+            source=request.source,
+            created_by_membership_id=request.created_by_membership_id,
+            assigned_membership_id=assigned_membership_id,
             created_at=request.created_at,
             updated_at=updated_at,
         )
@@ -278,6 +327,7 @@ async def test_transition_request_status_use_case_updates_request_and_creates_ac
         status=RequestStatus.NEW,
         source=RequestSource.EMAIL,
         created_by_membership_id=membership.id,
+        assigned_membership_id=None,
         created_at=now,
         updated_at=now,
     )
@@ -324,6 +374,7 @@ async def test_transition_request_status_use_case_rejects_invalid_transition() -
         status=RequestStatus.NEW,
         source=RequestSource.EMAIL,
         created_by_membership_id=membership.id,
+        assigned_membership_id=None,
         created_at=now,
         updated_at=now,
     )
@@ -382,6 +433,7 @@ async def test_transition_request_status_use_case_rejects_missing_membership() -
         status=RequestStatus.NEW,
         source=RequestSource.EMAIL,
         created_by_membership_id=uuid4(),
+        assigned_membership_id=None,
         created_at=now,
         updated_at=now,
     )
@@ -418,6 +470,7 @@ async def test_transition_request_status_use_case_rejects_membership_from_other_
         status=RequestStatus.NEW,
         source=RequestSource.EMAIL,
         created_by_membership_id=uuid4(),
+        assigned_membership_id=None,
         created_at=now,
         updated_at=now,
     )
@@ -454,6 +507,7 @@ async def test_transition_request_status_use_case_rejects_request_from_other_org
         status=RequestStatus.NEW,
         source=RequestSource.EMAIL,
         created_by_membership_id=membership.id,
+        assigned_membership_id=None,
         created_at=now,
         updated_at=now,
     )

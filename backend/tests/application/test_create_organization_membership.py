@@ -92,6 +92,13 @@ class InMemoryOrganizationMembershipRepository(OrganizationMembershipRepository)
             if membership.user_id == user_id and membership.is_active
         ]
 
+    async def list_active_by_organization_id(self, organization_id):
+        return [
+            membership
+            for membership in self._memberships.values()
+            if membership.organization_id == organization_id and membership.is_active
+        ]
+
 
 def _organization() -> Organization:
     now = datetime.now(UTC)

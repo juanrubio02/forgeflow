@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Industrial Request Intelligence",
-  description: "Workspace operativo para solicitudes industriales e inteligencia documental.",
+  description: "Operational platform for industrial requests, document intelligence and demo-ready workflows.",
 };
 
 export default function RootLayout({

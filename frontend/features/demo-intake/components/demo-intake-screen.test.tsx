@@ -59,7 +59,7 @@ describe("DemoIntakeScreen", () => {
   it("renders demo intake scenario cards", () => {
     render(<DemoIntakeScreen />);
 
-    expect(screen.getByText(/simulador de intake demo/i)).toBeInTheDocument();
+    expect(screen.getByText(/escenarios demo de intake/i)).toBeInTheDocument();
     expect(
       screen.getByText(/RFQ - Stainless Steel Mounting Brackets/i),
     ).toBeInTheDocument();
