@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/dev-common.sh"
 
 #######################################
-# Cross-platform helpers
+# Requirements
 #######################################
 
 require_command docker
@@ -20,11 +20,14 @@ else
   COMPOSE_CMD="docker compose"
 fi
 
-# Cross-platform port check (Linux + macOS)
+#######################################
+# Cross-platform port check
+#######################################
+
 is_port_in_use() {
   local port=$1
   if command -v lsof >/dev/null 2>&1; then
-    lsof -i :"$port" >/dev/null 2>&1
+    lsof -iTCP -sTCP:LISTEN -P | grep -q ":$port "
   else
     netstat -an 2>/dev/null | grep -q "\.$port "
   fi
@@ -66,6 +69,8 @@ fi
 BACKEND_PORT=$(find_free_port "$BACKEND_PORT")
 FRONTEND_PORT=$(find_free_port "$FRONTEND_PORT")
 
+export BACKEND_PORT
+
 BACKEND_PUBLIC_URL="http://localhost:$BACKEND_PORT"
 BACKEND_URL="$BACKEND_PUBLIC_URL"
 
@@ -83,7 +88,7 @@ echo "  Frontend: $FRONTEND_PORT"
 clear_stale_frontend_pid
 
 #######################################
-# Env
+# Write env (important: uses dynamic backend port)
 #######################################
 
 write_frontend_env
