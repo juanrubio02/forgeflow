@@ -15,11 +15,13 @@ if [[ "${1:-}" == "--rebuild" ]]; then
   REBUILD_IMAGES=true
 fi
 
-if [[ ! -d "$FRONTEND_DIR/node_modules" ]]; then
-  echo "Frontend dependencies are missing. Run 'cd frontend && npm install' once before dev-up." >&2
-  exit 1
+if [[ ! -d "$FRONTEND_DIR/node_modules" || ! -f "$FRONTEND_DIR/package-lock.json" ]]; then
+  echo "Installing frontend dependencies..."
+  (
+    cd "$FRONTEND_DIR"
+    npm install
+  )
 fi
-
 clear_stale_frontend_pid
 ensure_port_available_or_expected "$BACKEND_PORT" "$BACKEND_URL/health" "backend"
 ensure_port_available_or_expected "$FRONTEND_PORT" "$FRONTEND_URL/login" "frontend"
