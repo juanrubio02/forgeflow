@@ -7,9 +7,7 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.core.settings import get_settings
 from app.infrastructure.database.base import Base
-from app.infrastructure.database.models import OrganizationModel
 
 config = context.config
 
@@ -17,13 +15,16 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
-settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.database_url)
+
+# 🔥 URL FORZADA (DEBUG DEFINITIVO)
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@postgres:5432/industrial_requests"
+
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
 def run_migrations_offline() -> None:
     context.configure(
-        url=settings.database_url,
+        url=DATABASE_URL,   # ✅ ahora correcto
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
