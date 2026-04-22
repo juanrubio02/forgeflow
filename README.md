@@ -43,9 +43,18 @@ High-level flow:
 4. processing extracts text, document type, summary and structured fields
 5. an operator reviews the request, comments, assignment and verified document data
 
+Backend boundaries follow clean architecture:
+
+- `domain/`: pure entities, enums and business rules
+- `application/`: use cases, commands, read models and authorization policies
+- `infrastructure/`: SQLAlchemy repositories, JWT, storage and processing adapters
+- `interfaces/http/`: FastAPI routes, middleware, dependency injection and API schemas
+
 ## Main Features
 
 - authentication and organization-scoped access context
+- JWT access + refresh token flow with HTTP-only cookies and Bearer support
+- RBAC with `OWNER`, `ADMIN` and `MEMBER`
 - industrial request pipeline with status transitions
 - request assignment and internal comments
 - request activity timeline
@@ -94,9 +103,84 @@ What `./scripts/dev-up.sh` does:
 - writes `frontend/.env.local` with `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000`
 - starts PostgreSQL, Redis and the FastAPI backend with Docker Compose
 - runs Alembic migrations on startup
-- seeds the demo organization and demo user
+- seeds the demo organization, owner membership and demo user
 - starts the Next.js frontend on port `3000`
 - mounts backend source code into the container and uses live reload for normal backend code changes
+
+## API Surface
+
+All backend routes are versioned under:
+
+```text
+/api/v1
+```
+
+### Bootstrap endpoints
+
+Bootstrap endpoints exist only to create the initial tenant and operator context in local/demo environments. They require `X-Bootstrap-Key`.
+
+- `POST /api/v1/bootstrap/users`
+- `POST /api/v1/bootstrap/organizations`
+- `POST /api/v1/bootstrap/organizations/{organization_id}/memberships`
+
+These endpoints are intentionally separated from the protected application surface so user, organization and membership creation are not publicly exposed.
+
+### Protected endpoints
+
+All operational endpoints require authentication, and tenant-scoped endpoints also require an active membership context.
+
+Examples:
+
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh`
+- `GET /api/v1/auth/me`
+- `GET /api/v1/auth/memberships`
+- `GET /api/v1/requests`
+- `POST /api/v1/requests`
+- `POST /api/v1/requests/{request_id}/documents/upload`
+- `POST /api/v1/documents/{document_id}/processing-jobs`
+
+### Authentication flow
+
+1. Log in through `POST /api/v1/auth/login`.
+2. The backend returns the JWT `access_token` in the response body and stores both access and refresh tokens in HTTP-only cookies.
+3. The refresh token is rotated server-side and is not exposed in the JSON payload.
+4. Use `Authorization: Bearer <access_token>` for API clients when needed.
+5. Refresh the session through `POST /api/v1/auth/refresh`.
+
+### Tenant context and required headers
+
+This is a multi-tenant SaaS backend. Authentication identifies the user, but the active workspace is selected through membership context.
+
+- `Authorization: Bearer <access_token>`: required for protected API access when not relying on cookies
+- `X-Membership-Id: <membership_uuid>`: required for organization-scoped operations
+- `X-Bootstrap-Key: <bootstrap_key>`: required only for bootstrap endpoints
+
+Error semantics:
+
+- `401 Unauthorized`: no valid access token or no valid membership context
+- `403 Forbidden`: authenticated, but the active membership does not have permission for the action
+
+### RBAC
+
+- `OWNER`: full tenant administration, including sensitive membership changes
+- `ADMIN`: operational administration inside the tenant
+- `MEMBER`: standard workspace access with restricted mutation capabilities
+
+### Pagination
+
+List endpoints return:
+
+```json
+{
+  "items": [],
+  "total": 0,
+  "limit": 20,
+  "offset": 0
+}
+```
+
+Default `limit` is `20` and maximum `limit` is `100`.
 
 ### Official development ports
 
@@ -175,7 +259,7 @@ Backend does not come up:
 ```bash
 ./scripts/dev-logs.sh
 docker compose ps
-curl http://localhost:8000/health
+curl http://localhost:8000/api/v1/health
 ```
 
 Frontend points to the wrong API URL:
@@ -233,7 +317,6 @@ pytest
 
 ## Current Limitations
 
-- authentication is demo-grade token auth, not a full production identity setup
 - document intelligence is local and deterministic enough for demo purposes, not production-scale AI orchestration
 - file storage is local filesystem storage
 - there is no audit/export layer beyond the in-product timeline
@@ -241,10 +324,10 @@ pytest
 
 ## Short Roadmap
 
-- role-based permissions per action surface
 - richer verified-data schemas per document type
 - external object storage and async worker deployment
 - analytics around request throughput and bottlenecks
+- audit trail export / compliance reporting
 
 ## Public Release Notes
 

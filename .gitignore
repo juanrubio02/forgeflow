@@ -1,8 +1,8 @@
 # Node
 node_modules/
 frontend/node_modules/
-.next/
-frontend/.next/
+.next*
+frontend/.next*
 
 # Python
 .venv/
@@ -11,6 +11,7 @@ __pycache__/
 **/__pycache__/
 *.pyc
 .pytest_cache/
+.mypy_cache/
 *.egg-info/
 .coverage
 .coverage.*
@@ -35,7 +36,9 @@ dist/
 coverage/
 .dev-runtime/
 storage/
-backend/storage/
+**/storage/
+*.sqlite3
+*.db
 
 # OS / editor
 .DS_Store
