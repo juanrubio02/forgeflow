@@ -21,7 +21,7 @@ else
 fi
 
 #######################################
-# Cross-platform port check
+# Cross-platform port check (frontend only)
 #######################################
 
 is_port_in_use() {
@@ -63,23 +63,13 @@ if [[ ! -d "$FRONTEND_DIR/node_modules" ]]; then
 fi
 
 #######################################
-# Dynamic ports
+# Frontend dynamic port
 #######################################
 
-BACKEND_PORT=$(find_free_port "$BACKEND_PORT")
 FRONTEND_PORT=$(find_free_port "$FRONTEND_PORT")
-
-export BACKEND_PORT
-
-BACKEND_PUBLIC_URL="http://localhost:$BACKEND_PORT"
-BACKEND_URL="$BACKEND_PUBLIC_URL"
 
 FRONTEND_PUBLIC_URL="http://localhost:$FRONTEND_PORT"
 FRONTEND_URL="$FRONTEND_PUBLIC_URL"
-
-echo "Using ports:"
-echo "  Backend:  $BACKEND_PORT"
-echo "  Frontend: $FRONTEND_PORT"
 
 #######################################
 # Cleanup stale frontend process
@@ -88,24 +78,45 @@ echo "  Frontend: $FRONTEND_PORT"
 clear_stale_frontend_pid
 
 #######################################
-# Write env (important: uses dynamic backend port)
-#######################################
-
-write_frontend_env
-
-#######################################
 # Start backend (Docker)
 #######################################
 
 echo "Starting backend, PostgreSQL and Redis..."
 
 if $REBUILD_IMAGES; then
-  BACKEND_PORT=$BACKEND_PORT $COMPOSE_CMD up -d --build postgres redis backend
+  $COMPOSE_CMD up -d --build postgres redis backend
 else
-  BACKEND_PORT=$BACKEND_PORT $COMPOSE_CMD up -d postgres redis backend
+  $COMPOSE_CMD up -d postgres redis backend
 fi
 
+#######################################
+# Detect real backend port (Docker dynamic)
+#######################################
+
+echo "Detecting backend port assigned by Docker..."
+
+CONTAINER_NAME=$($COMPOSE_CMD ps -q backend)
+
+BACKEND_PORT_REAL=$(docker port "$CONTAINER_NAME" 8000 | sed 's/.*://')
+
+BACKEND_PUBLIC_URL="http://localhost:$BACKEND_PORT_REAL"
+BACKEND_URL="$BACKEND_PUBLIC_URL"
+
+echo "Using ports:"
+echo "  Backend:  $BACKEND_PORT_REAL"
+echo "  Frontend: $FRONTEND_PORT"
+
+#######################################
+# Wait backend
+#######################################
+
 wait_for_http "$BACKEND_URL/health" "Backend API" 90
+
+#######################################
+# Write frontend env (NOW correct)
+#######################################
+
+write_frontend_env
 
 #######################################
 # Seed data
