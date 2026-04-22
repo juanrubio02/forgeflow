@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     postgres_host: str = Field(default="localhost", alias="POSTGRES_HOST")
     postgres_port: int = Field(default=5432, alias="POSTGRES_PORT")
-    postgres_db: str = Field(default="forgeflow_requests", alias="POSTGRES_DB")
+    postgres_db: str = Field(default="industrial_requests", alias="POSTGRES_DB")    
     postgres_user: str = Field(default="postgres", alias="POSTGRES_USER")
     postgres_password: str = Field(default="postgres", alias="POSTGRES_PASSWORD")
 
