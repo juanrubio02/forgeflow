@@ -21,7 +21,7 @@ else
 fi
 
 #######################################
-# Cross-platform port check (frontend only)
+# Cross-platform helpers (frontend port)
 #######################################
 
 is_port_in_use() {
@@ -56,10 +56,7 @@ fi
 
 if [[ ! -d "$FRONTEND_DIR/node_modules" ]]; then
   echo "Installing frontend dependencies..."
-  (
-    cd "$FRONTEND_DIR"
-    npm install
-  )
+  ( cd "$FRONTEND_DIR" && npm install )
 fi
 
 #######################################
@@ -67,7 +64,6 @@ fi
 #######################################
 
 FRONTEND_PORT=$(find_free_port "$FRONTEND_PORT")
-
 FRONTEND_PUBLIC_URL="http://localhost:$FRONTEND_PORT"
 FRONTEND_URL="$FRONTEND_PUBLIC_URL"
 
@@ -97,7 +93,22 @@ echo "Detecting backend port assigned by Docker..."
 
 CONTAINER_NAME=$($COMPOSE_CMD ps -q backend)
 
-BACKEND_PORT_REAL=$(docker port "$CONTAINER_NAME" 8000 | head -n1 | awk -F: '{print $2}')
+if [[ -z "$CONTAINER_NAME" ]]; then
+  echo "❌ Backend container not found"
+  exit 1
+fi
+
+# Robust parsing (works on Linux/macOS)
+BACKEND_PORT_REAL=$(docker port "$CONTAINER_NAME" 8000 \
+  | grep -oE '[0-9]+$' \
+  | head -n1)
+
+if [[ -z "$BACKEND_PORT_REAL" ]]; then
+  echo "❌ Could not detect backend port"
+  docker logs "$CONTAINER_NAME" || true
+  exit 1
+fi
+
 BACKEND_PUBLIC_URL="http://localhost:$BACKEND_PORT_REAL"
 BACKEND_URL="$BACKEND_PUBLIC_URL"
 
@@ -106,13 +117,29 @@ echo "  Backend:  $BACKEND_PORT_REAL"
 echo "  Frontend: $FRONTEND_PORT"
 
 #######################################
-# Wait backend
+# Wait backend (robust + logs on failure)
 #######################################
 
-wait_for_http "$BACKEND_URL/health" "Backend API" 90
+echo "Waiting for backend API to be ready..."
+
+ATTEMPTS=60
+for i in $(seq 1 $ATTEMPTS); do
+  if curl -fs "$BACKEND_URL/health" >/dev/null 2>&1; then
+    echo "✅ Backend is ready"
+    break
+  fi
+
+  sleep 2
+
+  if [[ $i -eq $ATTEMPTS ]]; then
+    echo "❌ Backend failed to start. Showing logs:"
+    docker logs "$CONTAINER_NAME" || true
+    exit 1
+  fi
+done
 
 #######################################
-# Write frontend env (NOW correct)
+# Write frontend env (uses real backend port)
 #######################################
 
 write_frontend_env
@@ -145,7 +172,7 @@ else
 
   LISTENER_PID="$(frontend_listener_pid)"
   if [[ -z "$LISTENER_PID" ]]; then
-    echo "Frontend started but no listener PID detected." >&2
+    echo "❌ Frontend started but no listener PID detected."
     exit 1
   fi
 
