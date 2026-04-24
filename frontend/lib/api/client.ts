@@ -1,4 +1,4 @@
-import { DEFAULT_API_BASE_URL } from "@/lib/constants";
+import { DEFAULT_API_BASE_URL, API_PREFIX } from "@/lib/constants";
 import {
   clearStoredAuthState,
   getStoredActiveMembershipId,
@@ -30,12 +30,17 @@ function buildHeaders(options: ApiRequestOptions): Headers {
     headers.set("Accept", "application/json");
   }
 
-  if (options.body && !(options.body instanceof FormData) && !headers.has("Content-Type")) {
+  if (
+    options.body &&
+    !(options.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
     headers.set("Content-Type", "application/json");
   }
 
   if (options.includeMembership || options.includeOptionalMembership) {
     const membershipId = getStoredActiveMembershipId();
+
     if (!membershipId) {
       if (options.includeOptionalMembership) {
         return headers;
@@ -43,7 +48,7 @@ function buildHeaders(options: ApiRequestOptions): Headers {
 
       throw new ApiError(
         400,
-        "An active access context must be selected before this request can be executed.",
+        "An active access context must be selected before this request can be executed."
       );
     }
 
@@ -55,6 +60,7 @@ function buildHeaders(options: ApiRequestOptions): Headers {
 
 function handleUnauthorized(): void {
   clearStoredAuthState();
+
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("iri:unauthorized"));
   }
@@ -62,14 +68,18 @@ function handleUnauthorized(): void {
 
 export async function apiRequest<T>(
   path: string,
-  options: ApiRequestOptions = {},
+  options: ApiRequestOptions = {}
 ): Promise<T | null> {
   const headers = buildHeaders(options);
-  const response = await fetch(`${DEFAULT_API_BASE_URL}${path}`, {
-    ...options,
-    credentials: options.credentials ?? "include",
-    headers,
-  });
+
+  const response = await fetch(
+    `${DEFAULT_API_BASE_URL}${API_PREFIX}${path}`,
+    {
+      ...options,
+      credentials: options.credentials ?? "include",
+      headers,
+    }
+  );
 
   if (response.status === 401) {
     handleUnauthorized();

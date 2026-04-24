@@ -7,6 +7,7 @@ WORKDIR /app
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
+        curl \
         libgl1 \
         libglib2.0-0 \
         libsm6 \

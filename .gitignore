@@ -1,8 +1,12 @@
 # Node
 node_modules/
 frontend/node_modules/
-.next*
-frontend/.next*
+.next/
+frontend/.next/
+out/
+
+# TypeScript
+*.tsbuildinfo
 
 # Python
 .venv/
@@ -39,6 +43,10 @@ storage/
 **/storage/
 *.sqlite3
 *.db
+
+# Docker / runtime
+*.pid
+*.sock
 
 # OS / editor
 .DS_Store
