@@ -45,6 +45,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
+
   const activeOrganization = user?.active_organization ?? null;
   const activeMembership = user?.active_membership ?? null;
   const role = activeMembership?.role ?? null;
@@ -54,19 +55,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  // 🔥 REFRESCAR USUARIO (FUENTE REAL)
   const refreshMe = useCallback(async () => {
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      clearAuthState();
-      return;
-    }
+    try {
+      const currentUser = await getCurrentUser();
 
-    setUser(currentUser);
+      if (!currentUser) {
+        clearAuthState();
+        return;
+      }
+
+      setUser(currentUser);
+    } catch {
+      clearAuthState();
+    }
   }, [clearAuthState]);
 
+  // 🔥 BOOTSTRAP INICIAL
   const bootstrap = useCallback(async () => {
     try {
       const currentUser = await getCurrentUser();
+
       if (!currentUser) {
         clearAuthState();
       } else {
@@ -83,20 +92,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void bootstrap();
   }, [bootstrap]);
 
+  // 🔥 LISTENER GLOBAL (expulsión por 401)
   useEffect(() => {
     const onUnauthorized = () => clearAuthState();
     window.addEventListener("iri:unauthorized", onUnauthorized);
     return () => window.removeEventListener("iri:unauthorized", onUnauthorized);
   }, [clearAuthState]);
 
+  // 💣 LOGIN CORREGIDO (CLAVE)
   const login = useCallback(async (email: string, password: string) => {
-    const session = await loginRequest({ email, password });
-    if (!session?.user) {
+    // 1. login → crea cookies
+    await loginRequest({ email, password });
+
+    // 2. 🔥 SIEMPRE obtener usuario real desde backend
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
       clearAuthState();
-      throw new Error("Login did not return an authenticated user.");
+      throw new Error("Unable to fetch authenticated user after login.");
     }
 
-    setUser(session.user);
+    // 3. estado consistente
+    setUser(currentUser);
+
   }, [clearAuthState]);
 
   const logout = useCallback(async () => {

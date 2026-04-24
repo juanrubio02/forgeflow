@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from uuid import uuid4
+from datetime import datetime, timezone  # 👈 añadido
 
 from sqlalchemy import select
 
@@ -87,6 +88,7 @@ async def main() -> None:
                 )
             )
         ).scalar_one_or_none()
+
         if membership is None:
             membership = OrganizationMembershipModel(
                 id=uuid4(),
@@ -94,6 +96,7 @@ async def main() -> None:
                 user_id=user.id,
                 role=DEMO_USER_ROLE,
                 is_active=True,
+                joined_at=datetime.now(timezone.utc),  # 👈 SOLUCIÓN REAL
             )
             session.add(membership)
         else:

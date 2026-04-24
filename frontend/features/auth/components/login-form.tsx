@@ -21,13 +21,15 @@ type LoginFormValues = {
 
 export function LoginForm() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login } = useAuth(); // ✅ SOLO login
   const { pushToast } = useToast();
   const { messages } = useI18n();
+
   const loginSchema = z.object({
     email: z.string().email(messages.login.form.validation.email),
     password: z.string().min(8, messages.login.form.validation.password),
   });
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -38,19 +40,25 @@ export function LoginForm() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
+      // ✅ Login (el provider ya hace refresh interno)
       await login(values.email, values.password);
+
       pushToast({
         tone: "success",
         title: messages.login.form.successTitle,
         description: messages.login.form.successDescription,
       });
+
       router.replace("/dashboard");
+
     } catch (error) {
       pushToast({
         tone: "error",
         title: messages.login.form.errorTitle,
         description:
-          error instanceof ApiError ? error.detail : messages.login.form.fallbackError,
+          error instanceof ApiError
+            ? error.detail
+            : messages.login.form.fallbackError,
       });
     }
   });
@@ -61,11 +69,14 @@ export function LoginForm() {
         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
           {messages.login.form.eyebrow}
         </p>
-        <CardTitle className="text-3xl">{messages.login.form.title}</CardTitle>
+        <CardTitle className="text-3xl">
+          {messages.login.form.title}
+        </CardTitle>
         <CardDescription>
           {messages.login.form.description}
         </CardDescription>
       </CardHeader>
+
       <CardContent>
         <form className="space-y-5" onSubmit={onSubmit}>
           <div className="space-y-2">
@@ -82,9 +93,11 @@ export function LoginForm() {
                 {...form.register("email")}
               />
             </div>
-            {form.formState.errors.email ? (
-              <p className="text-sm text-rose-600">{form.formState.errors.email.message}</p>
-            ) : null}
+            {form.formState.errors.email && (
+              <p className="text-sm text-rose-600">
+                {form.formState.errors.email.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -101,12 +114,18 @@ export function LoginForm() {
                 {...form.register("password")}
               />
             </div>
-            {form.formState.errors.password ? (
-              <p className="text-sm text-rose-600">{form.formState.errors.password.message}</p>
-            ) : null}
+            {form.formState.errors.password && (
+              <p className="text-sm text-rose-600">
+                {form.formState.errors.password.message}
+              </p>
+            )}
           </div>
 
-          <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={form.formState.isSubmitting}
+          >
             {form.formState.isSubmitting
               ? messages.login.form.submitting
               : messages.login.form.submit}
